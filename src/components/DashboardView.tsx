@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   FileText, Clock, AlertCircle, CreditCard, CheckCircle2, ChevronRight, 
-  Plus, Send, History, MessageSquare, ShieldAlert, Zap, Check
+  Plus, Send, History, MessageSquare, ShieldAlert, Zap, Check, Sparkles,
+  Mail, Search, FileEdit, PenTool, Flag, X, Bot, Wand2
 } from 'lucide-react';
 import { Contract, ContractStatus } from '../types';
 import { format } from 'date-fns';
@@ -20,10 +21,13 @@ interface DashboardViewProps {
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelectContract, onNewContract, onNavigate }) => {
+  const [pipelineFilter, setPipelineFilter] = useState<string>('All');
+  const [showAiModal, setShowAiModal] = useState(false);
+
   const [tasks, setTasks] = useState([
-    { id: 1, title: "Reply to Legal", subtitle: "TechVibe Marketing Agreement", time: "2h ago", icon: <MessageSquare size={16} className="text-blue-500" /> },
-    { id: 2, title: "Version Conflict", subtitle: "CloudScale Subscription", time: "5h ago", icon: <History size={16} className="text-amber-500" /> },
-    { id: 3, title: "Submit Payment Request", subtitle: "SocialAds Q2 Placement", time: "Yesterday", icon: <Send size={16} className="text-emerald-500" /> },
+    { id: 1, title: "Nudge Required", subtitle: "Global Events - Stuck for 5 days", time: "2h ago", icon: <Clock size={16} className="text-red-500" /> },
+    { id: 2, title: "New Comment", subtitle: "TechVibe - Legal needs clarification", time: "5h ago", icon: <MessageSquare size={16} className="text-blue-500" /> },
+    { id: 3, title: "Urgent Edit", subtitle: "CloudScale - Version conflict", time: "Yesterday", icon: <AlertCircle size={16} className="text-amber-500" /> },
   ]);
 
   const [completingId, setCompletingId] = useState<number | null>(null);
@@ -43,23 +47,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
   const overdueCount = 3;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* Hero Section - Inspired by DocuSign/Feishu */}
-      <div className="relative overflow-hidden bg-indigo-900 rounded-3xl p-8 text-white shadow-xl">
+      <div className="relative overflow-hidden bg-indigo-900 rounded-2xl p-6 text-white shadow-xl">
         <div className="relative z-10 max-w-2xl">
-          <h2 className="text-3xl font-bold mb-2">Welcome back, Na Zhang</h2>
-          <p className="text-indigo-100 mb-6 text-lg font-medium">AI-Powered Risk Diagnosis for Smarter Decisions & Compliance</p>
-          <div className="flex gap-4">
-            <button 
-              onClick={onNewContract}
-              className="bg-white text-indigo-900 px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-50 transition-all shadow-lg"
-            >
-              <Plus size={20} /> Create New Contract
-            </button>
-            <button className="bg-indigo-700/50 backdrop-blur-sm border border-indigo-500/30 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700/70 transition-all">
-              View All Templates
-            </button>
-          </div>
+          <h2 className="text-2xl font-bold mb-1">Welcome back, Na Zhang</h2>
+          <p className="text-indigo-100 mb-0 text-base font-medium">Your AI copilot for safer contracts.</p>
         </div>
         {/* Decorative background elements */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-indigo-500/20 to-transparent" />
@@ -68,49 +61,51 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
 
       {/* Status Summary Cards - Compact Version */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div onClick={() => onNavigate?.('payment')}>
+        <div onClick={() => setPipelineFilter('Drafting & Negotiation')}>
+          <StatusCard 
+            title="Drafting & Negotiation" 
+            value="6" 
+            icon={<FileEdit size={18} className="text-indigo-600" />} 
+            color="indigo"
+            active={pipelineFilter === 'Drafting & Negotiation'}
+          />
+        </div>
+        <div onClick={() => setPipelineFilter('Approval & Signature')}>
+          <StatusCard 
+            title="Approval & Signature" 
+            value="8" 
+            icon={<PenTool size={18} className="text-amber-600" />} 
+            color="amber"
+            active={pipelineFilter === 'Approval & Signature'}
+          />
+        </div>
+        <div onClick={() => setPipelineFilter('Payment Prep')}>
+          <StatusCard 
+            title="Payment Prep" 
+            value="3" 
+            icon={<CreditCard size={18} className="text-blue-600" />} 
+            color="blue"
+            active={pipelineFilter === 'Payment Prep'}
+          />
+        </div>
+        <div onClick={() => setPipelineFilter('Completed')}>
           <StatusCard 
             title="Completed" 
-            label="Payment & Archive"
-            value={completedCount.toString()} 
-            icon={<CheckCircle2 size={18} className="text-emerald-600" />} 
+            value="16" 
+            icon={<Flag size={18} className="text-emerald-600" />} 
             color="emerald"
-          />
-        </div>
-        <div onClick={() => onNavigate?.('negotiations-list')}>
-          <StatusCard 
-            title="Active Negotiations" 
-            label="AI-Assisted Review"
-            value={inApprovalCount.toString()} 
-            icon={<Zap size={18} className="text-indigo-600" />} 
-            color="indigo"
-          />
-        </div>
-        <div onClick={() => onNavigate?.('all-contracts')}>
-          <StatusCard 
-            title="In Approval" 
-            label="Automated Workflow"
-            value={waitingSignatureCount.toString()} 
-            icon={<Clock size={18} className="text-amber-600" />} 
-            color="amber"
-          />
-        </div>
-        <div onClick={() => onNavigate?.('all-contracts')}>
-          <StatusCard 
-            title="Stuck" 
-            label="Attention Required"
-            value={overdueCount.toString()} 
-            icon={<AlertCircle size={18} className="text-red-600" />} 
-            color="red"
+            active={pipelineFilter === 'Completed'}
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Contract List - Timeline Dashboard */}
-        <div className="lg:col-span-2 glass-card p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Workflow Pipeline</h3>
+        <div className="lg:col-span-2 glass-card p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
+              {pipelineFilter === 'All' ? 'All Contracts' : pipelineFilter}
+            </h3>
             
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
               <select className="bg-slate-50 border border-slate-200 text-[10px] font-bold text-slate-600 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
@@ -119,17 +114,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                 <option>All Time</option>
               </select>
               <div className="w-px h-4 bg-slate-200 mx-1" />
-              <select className="bg-slate-50 border border-slate-200 text-[10px] font-bold text-slate-600 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                <option>All Status</option>
-                <option>Completed</option>
-                <option>Active Negotiations</option>
-                <option>In Approval</option>
-                <option>Stuck</option>
-              </select>
+              <button 
+                onClick={() => setPipelineFilter('All')}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all",
+                  pipelineFilter === 'All' ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+                )}
+              >
+                Show All
+              </button>
             </div>
           </div>
-          <div className="space-y-6">
-            {contracts.map((contract) => {
+          <div className="space-y-4">
+            {contracts
+              .filter(contract => {
+                if (pipelineFilter === 'All') return true;
+                if (pipelineFilter === 'Drafting & Negotiation') return contract.status === 'Drafting' || contract.status === 'Negotiation';
+                if (pipelineFilter === 'Approval & Signature') return contract.status === 'Internal Consultation' || contract.status === 'Legal Review' || contract.status === 'Finance Approval' || contract.status === 'Final Approval';
+                if (pipelineFilter === 'Payment Prep') return contract.status === 'Signed' || contract.status === 'Payment Ready';
+                if (pipelineFilter === 'Completed') return contract.status === 'Signed' || contract.status === 'Payment Ready'; // Simplified for mock
+                return true;
+              })
+              .map((contract) => {
               const currentStageIndex = STAGES.indexOf(contract.status);
               const currentApprover = contract.approvalPath?.find(p => p.status === 'Pending')?.name;
               
@@ -215,8 +221,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                         style={{ width: `${(currentStageIndex + 1) / STAGES.length * 100}%` }}
                       />
                     </div>
-                    <div className="flex justify-between mt-2">
-                      <span className="text-[10px] text-slate-400">Updated at {format(new Date(contract.updatedAt), 'MM-dd HH:mm')}</span>
+                    <div className="flex justify-between items-center mt-2">
+                      <div className="flex items-center gap-4">
+                        <span className="text-[10px] text-slate-400">Updated at {format(new Date(contract.updatedAt), 'MM-dd HH:mm')}</span>
+                        {config.label === 'Stuck' && (
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); }}
+                              className="flex items-center gap-1.5 px-2 py-0.5 bg-red-50 text-red-600 border border-red-100 rounded-md text-[10px] font-bold hover:bg-red-100 transition-all"
+                            >
+                              <Send size={10} /> Nudge Now
+                            </button>
+                            <div className="flex items-center gap-1.5 text-slate-400">
+                              <Mail size={12} className="hover:text-indigo-500 transition-colors" />
+                              <MessageSquare size={12} className="hover:text-indigo-500 transition-colors" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
                       <span className="text-[10px] font-bold text-slate-500">
                         Stage {currentStageIndex + 1} / {STAGES.length}
                         {currentApprover && <span className="ml-2 text-indigo-600">Current: {currentApprover}</span>}
@@ -231,9 +253,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         </div>
 
         {/* Quick Actions / Tasks Sidebar */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="glass-card p-6">
-            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-6">To Do Tasks</h3>
+        <div className="lg:col-span-1 space-y-4">
+          <div className="glass-card p-4">
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Needs Attention</h3>
             <div className="space-y-4">
               <AnimatePresence mode="popLayout">
                 {tasks.map((task) => (
@@ -269,24 +291,104 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
               View Task Center
             </button>
           </div>
-
-          <div className="glass-card p-6 bg-indigo-50 border-indigo-100">
-            <h3 className="text-sm font-bold text-indigo-900 mb-4">AI Assistant Suggestions</h3>
-            <p className="text-xs text-indigo-700 leading-relaxed mb-4">
-              Detected that the <strong>Global Events</strong> contract has been in "Negotiation" for over 5 days. Suggest using AI to re-evaluate disputed clauses.
-            </p>
-            <button className="text-xs font-bold text-indigo-600 flex items-center gap-1 hover:underline">
-              Take Action <ChevronRight size={14} />
-            </button>
-          </div>
         </div>
       </div>
+      {/* Floating AI Assistant Button */}
+      <button 
+        onClick={() => setShowAiModal(true)}
+        className="fixed bottom-8 right-8 bg-indigo-500 text-white px-6 py-4 rounded-full shadow-2xl shadow-indigo-200 flex items-center gap-3 hover:bg-indigo-600 hover:scale-105 transition-all z-50 group"
+      >
+        <div className="relative">
+          <Sparkles size={20} className="group-hover:rotate-12 transition-transform" />
+          <div className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
+        </div>
+        <span className="font-bold text-sm">Ask AI copilot</span>
+      </button>
+
+      {/* AI Assistant Modal */}
+      <AnimatePresence>
+        {showAiModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowAiModal(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden"
+            >
+              <div className="bg-indigo-900 p-6 text-white relative">
+                <button 
+                  onClick={() => setShowAiModal(false)}
+                  className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <X size={20} />
+                </button>
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Bot className="text-white" size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">LegaliFi AI Copilot</h3>
+                    <p className="text-indigo-200 text-sm">Always ready to help with your contracts</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    "Hello Na Zhang! I've analyzed your current pipeline. You have <span className="font-bold text-indigo-600">3 overdue tasks</span> that need immediate attention. Would you like me to draft a follow-up email for the <span className="font-bold text-indigo-600">Global Logistics Agreement</span>?"
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-2">
+                  <button className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left group">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                      <Wand2 size={16} className="text-slate-500 group-hover:text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">Draft follow-up email</p>
+                      <p className="text-[10px] text-slate-500">For Global Logistics Agreement</p>
+                    </div>
+                  </button>
+                  <button className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left group">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                      <Search size={16} className="text-slate-500 group-hover:text-indigo-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-800">Summarize contract risks</p>
+                      <p className="text-[10px] text-slate-500">Analyze the latest draft version</p>
+                    </div>
+                  </button>
+                </div>
+                
+                <div className="relative mt-4">
+                  <input 
+                    type="text" 
+                    placeholder="Ask me anything about your contracts..." 
+                    className="w-full pl-4 pr-12 py-3 bg-slate-100 border-transparent rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all"
+                  />
+                  <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors">
+                    <Send size={16} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-function StatusCard({ title, value, label, icon, color }: { 
-  title: string, value: string, label: string, icon: React.ReactNode, color: string
+function StatusCard({ title, value, icon, color, active }: { 
+  title: string, value: string, icon: React.ReactNode, color: string, active?: boolean
 }) {
   const colorClasses: Record<string, string> = {
     emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
@@ -297,16 +399,27 @@ function StatusCard({ title, value, label, icon, color }: {
   };
 
   return (
-    <div className="glass-card p-3 flex items-center gap-3 hover:shadow-md transition-all cursor-pointer group border-slate-100">
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 relative ${colorClasses[color]}`}>
-        {icon}
-        <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white border border-slate-100 rounded-full flex items-center justify-center shadow-sm">
-          <span className="text-[10px] font-bold text-slate-700">{value}</span>
+    <div className={cn(
+      "glass-card p-3 flex items-center gap-3 hover:shadow-md transition-all cursor-pointer group border-slate-100",
+      active ? "bg-indigo-900 border-indigo-900 shadow-lg shadow-indigo-100" : "hover:bg-white"
+    )}>
+      <div className={cn(
+        "w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 relative transition-colors",
+        active ? "bg-indigo-800 border-indigo-700 text-white" : colorClasses[color]
+      )}>
+        <span className={cn("transition-colors", active ? "text-white" : "")}>{icon}</span>
+        <div className={cn(
+          "absolute -top-1.5 -right-1.5 w-5 h-5 border rounded-full flex items-center justify-center shadow-sm transition-colors",
+          active ? "bg-indigo-500 border-indigo-400 text-white" : "bg-white border-slate-100 text-slate-700"
+        )}>
+          <span className="text-[10px] font-bold">{value}</span>
         </div>
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight truncate">{title}</p>
-        <p className="text-xs font-bold text-slate-800">{label}</p>
+        <p className={cn(
+          "text-xs font-bold uppercase tracking-tight leading-tight transition-colors",
+          active ? "text-white" : "text-slate-800"
+        )}>{title}</p>
       </div>
     </div>
   );

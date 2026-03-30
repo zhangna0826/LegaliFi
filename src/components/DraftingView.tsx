@@ -21,9 +21,15 @@ function cn(...inputs: ClassValue[]) {
 
 type SidebarTab = 'details' | 'comments' | 'risks' | 'files';
 
-export const DraftingView: React.FC = () => {
+interface DraftingViewProps {
+  initialContent?: string;
+  initialTitle?: string;
+  onBack?: () => void;
+}
+
+export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, initialTitle, onBack }) => {
   const [activeTab, setActiveTab] = useState<SidebarTab>('details');
-  const [content, setContent] = useState(`
+  const [content, setContent] = useState(initialContent || `
 # OFFICE SUPPLIES PROCUREMENT AGREEMENT
 
 **Contract No:** BGHC10000
@@ -118,12 +124,15 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
       {/* Top Header */}
       <div className="flex items-center justify-between px-4 py-1.5 bg-white border-b border-slate-200">
         <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+          <button 
+            onClick={onBack}
+            className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+          >
             <ChevronLeft size={20} className="text-slate-600" />
           </button>
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <h2 className="font-bold text-slate-800">Office Supplies Procurement Agreement.docx</h2>
+              <h2 className="font-bold text-slate-800 truncate max-w-[300px]">{initialTitle || 'Office Supplies Procurement Agreement.docx'}</h2>
               <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded uppercase">Drafting</span>
             </div>
             <span className="text-[10px] text-slate-400">V1.0 • Auto-saved at 18:55</span>
@@ -144,7 +153,7 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-1 px-4 py-1.5 bg-white border-b border-slate-200 overflow-x-auto no-scrollbar shadow-sm z-10">
+      <div className="flex items-center gap-1 px-4 h-[40px] bg-white border-b border-slate-200 overflow-x-auto no-scrollbar shadow-sm z-10">
         <div className="flex items-center gap-1 px-2 border-r border-slate-200 mr-1">
           <select className="text-xs font-medium bg-transparent outline-none hover:bg-slate-100 p-1 rounded transition-colors">
             <option>Times New Roman</option>

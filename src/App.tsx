@@ -32,6 +32,7 @@ import { DraftingView } from './components/DraftingView';
 import { NegotiationView } from './components/NegotiationView';
 import { ApprovalView } from './components/ApprovalView';
 import { PaymentView } from './components/PaymentView';
+import { CreateContractView } from './components/CreateContractView';
 import { AdminView } from './components/AdminView';
 import { ContractListView } from './components/ContractListView';
 
@@ -49,7 +50,7 @@ const MOCK_CONTRACTS: Contract[] = [
     amount: 12500, 
     status: 'Legal Review', // In Approval 1
     updatedAt: '2024-03-10T14:00:00Z', 
-    owner: 'Erin Z.', 
+    owner: 'Na Zhang', 
     riskLevel: 'Medium',
     versions: [
       { id: 'v2', versionNumber: '2.0', author: 'Legal Team', timestamp: '2024-03-10T14:00:00Z', content: 'Standard indemnification applies.', changes: ['Updated liability clause'] },
@@ -71,7 +72,7 @@ const MOCK_CONTRACTS: Contract[] = [
     invoiceAmount: 4800,
     status: 'Signed', // Stage 7/8
     updatedAt: '2024-03-09T10:30:00Z', 
-    owner: 'Erin Z.', 
+    owner: 'Na Zhang', 
     riskLevel: 'Low', 
     paymentStatus: 'Paid',
     versions: [{ id: 'v1', versionNumber: '1.0', author: 'Erin Z.', timestamp: '2024-03-09T10:30:00Z', content: 'Final signed version.' }],
@@ -88,7 +89,7 @@ const MOCK_CONTRACTS: Contract[] = [
     amount: 25000, 
     status: 'Negotiation', // Stage 2/8
     updatedAt: '2024-03-11T09:15:00Z', 
-    owner: 'Erin Z.', 
+    owner: 'Na Zhang', 
     riskLevel: 'High',
     versions: [],
     comments: [],
@@ -219,12 +220,41 @@ const PERFORMANCE_METRICS: MetricData[] = [
   { name: 'Error Rate', baseline: 5, goal: 1 },
 ];
 
-type ViewType = 'dashboard' | 'drafting' | 'negotiation' | 'approval' | 'payment' | 'admin' | 'all-contracts' | 'drafts-list' | 'negotiations-list';
+type ViewType = 'dashboard' | 'drafting' | 'negotiation' | 'approval' | 'payment' | 'admin' | 'all-contracts' | 'drafts-list' | 'negotiations-list' | 'create-contract';
 
 export default function App() {
   const [activeView, setActiveView] = useState<ViewType>('dashboard');
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [contractsExpanded, setContractsExpanded] = useState(true);
+  const [draftingContent, setDraftingContent] = useState<string>('');
+  const [draftingTitle, setDraftingTitle] = useState<string>('');
+
+  const handleCreateContract = () => {
+    setActiveView('create-contract');
+  };
+
+  const handleSelectTemplate = (content: string, title: string) => {
+    setDraftingContent(content);
+    setDraftingTitle(title);
+    setActiveView('drafting');
+  };
+
+  const handleUploadContract = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      setDraftingContent(content || `# Uploaded Content: ${file.name}\n\n(Simulated content for ${file.name})`);
+      setDraftingTitle(file.name);
+      setActiveView('drafting');
+    };
+    if (file.type.startsWith('text/') || file.name.endsWith('.md')) {
+      reader.readAsText(file);
+    } else {
+      setDraftingContent(`# File: ${file.name}\n\nThis is a simulated view of the uploaded file: ${file.name}.\n\nIn a production environment, this would be processed by a document parser.`);
+      setDraftingTitle(file.name);
+      setActiveView('drafting');
+    }
+  };
 
   const renderView = () => {
     switch (activeView) {
@@ -239,7 +269,7 @@ export default function App() {
               else if (c.status === 'Signed') setActiveView('payment');
               else setActiveView('approval');
             }} 
-            onNewContract={() => setActiveView('drafting')}
+            onNewContract={handleCreateContract}
             onNavigate={(view) => setActiveView(view as ViewType)}
           />
         );
@@ -253,7 +283,7 @@ export default function App() {
               if (c.status === 'Drafting') setActiveView('drafting');
               else setActiveView('negotiation');
             }}
-            onNewContract={() => setActiveView('drafting')}
+            onNewContract={handleCreateContract}
           />
         );
       case 'drafts-list':
@@ -266,7 +296,7 @@ export default function App() {
               setSelectedContract(c);
               setActiveView('drafting');
             }}
-            onNewContract={() => setActiveView('drafting')}
+            onNewContract={handleCreateContract}
           />
         );
       case 'negotiations-list':
@@ -279,11 +309,15 @@ export default function App() {
               setSelectedContract(c);
               setActiveView('negotiation');
             }}
-            onNewContract={() => setActiveView('drafting')}
+            onNewContract={handleCreateContract}
           />
         );
       case 'drafting':
-        return <DraftingView />;
+        return <DraftingView 
+          initialContent={draftingContent} 
+          initialTitle={draftingTitle} 
+          onBack={() => setActiveView('create-contract')} 
+        />;
       case 'negotiation':
         return selectedContract ? <NegotiationView contract={selectedContract} /> : <div className="p-12 text-center text-slate-400">Please select a contract from the dashboard to view negotiation history.</div>;
       case 'approval':
@@ -292,23 +326,40 @@ export default function App() {
         return selectedContract ? <PaymentView contract={selectedContract} /> : <div className="p-12 text-center text-slate-400">Please select a contract to prepare payment.</div>;
       case 'admin':
         return <AdminView contracts={MOCK_CONTRACTS} />;
+      case 'create-contract':
+        return <CreateContractView 
+          onBack={() => setActiveView('dashboard')} 
+          onSelectTemplate={handleSelectTemplate}
+          onUpload={handleUploadContract}
+        />;
       default:
-        return <DashboardView contracts={MOCK_CONTRACTS} onSelectContract={setSelectedContract} onNewContract={() => setActiveView('drafting')} />;
+        return <DashboardView contracts={MOCK_CONTRACTS} onSelectContract={setSelectedContract} onNewContract={handleCreateContract} />;
     }
   };
 
   return (
     <div className="flex h-screen bg-[#f8f9fa]">
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col">
+      <aside className="w-[240px] bg-white border-r border-slate-200 flex flex-col">
         <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
-            <Zap className="text-white w-6 h-6" />
+          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 relative">
+            <FileText className="text-white w-6 h-6" />
+            <div className="absolute -bottom-1 -right-1 bg-emerald-500 rounded-full p-0.5 border-2 border-white">
+              <ShieldCheck className="text-white w-3 h-3" />
+            </div>
           </div>
           <span className="font-bold text-2xl tracking-tight text-slate-800">LegaliFi</span>
         </div>
 
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto py-4">
+          <button 
+            onClick={handleCreateContract}
+            className="w-full flex items-center justify-start gap-3 mb-6 px-4 py-3 bg-indigo-900 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-slate-800 transition-all active:scale-95"
+          >
+            <Plus size={20} />
+            <span>Create New Contract</span>
+          </button>
+
           <NavItem 
             icon={<LayoutDashboard size={18} />} 
             label="Dashboard" 
@@ -319,7 +370,7 @@ export default function App() {
           <div className="pt-4">
             <button 
               onClick={() => setContractsExpanded(!contractsExpanded)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all"
+              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-all text-left whitespace-nowrap"
             >
               <div className="flex items-center gap-3">
                 <FileText size={18} className="text-slate-400" />
@@ -337,22 +388,16 @@ export default function App() {
                   onClick={() => setActiveView('all-contracts')} 
                 />
                 <SubNavItem 
-                  icon={<Plus size={14} />}
-                  label="Create New Contract" 
-                  active={activeView === 'drafting'} 
-                  onClick={() => setActiveView('drafting')} 
-                />
-                <SubNavItem 
                   icon={<FileEdit size={14} />}
                   label="Drafts" 
                   active={activeView === 'drafts-list'} 
                   onClick={() => setActiveView('drafts-list')} 
                 />
                 <SubNavItem 
-                  icon={<Zap size={14} />}
-                  label="Active Negotiations" 
-                  active={activeView === 'negotiations-list'} 
-                  onClick={() => setActiveView('negotiations-list')} 
+                  icon={<History size={14} />}
+                  label="Contract Templates" 
+                  active={activeView === 'templates'} 
+                  onClick={() => setActiveView('templates')} 
                 />
               </div>
             )}
@@ -360,7 +405,7 @@ export default function App() {
 
           <div className="pt-4">
             <p className="px-4 py-2.5 text-sm font-bold text-slate-400 uppercase tracking-wider">Workflows</p>
-            <NavItem icon={<MessageSquare size={18} />} label="Approval Flow" active={activeView === 'approval'} onClick={() => setActiveView('approval')} />
+            <NavItem icon={<MessageSquare size={18} />} label="Approval Tracking" active={activeView === 'approval'} onClick={() => setActiveView('approval')} />
             <NavItem icon={<CreditCard size={18} />} label="Payment Prep" active={activeView === 'payment'} onClick={() => setActiveView('payment')} />
           </div>
 
@@ -374,7 +419,7 @@ export default function App() {
             <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-xs">NZ</div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold truncate">Na Zhang</p>
-              <p className="text-[10px] text-slate-500 truncate">Business Owner</p>
+              <p className="text-[10px] text-slate-500 truncate">Marketing Specialist</p>
             </div>
             <Settings size={16} className="text-slate-400" />
           </div>
@@ -390,7 +435,8 @@ export default function App() {
               activeView === 'all-contracts' ? 'All Contracts' :
               activeView === 'drafts-list' ? 'Draft Contracts' :
               activeView === 'negotiations-list' ? 'Active Negotiations' :
-              activeView === 'drafting' ? 'Create Contract' :
+              activeView === 'create-contract' ? 'Create New Contract' :
+              activeView === 'drafting' ? 'Contract Drafting' :
               activeView === 'negotiation' ? 'Negotiation & Versions' :
               activeView === 'approval' ? 'Approval Workflow' :
               activeView === 'payment' ? 'Deliverables & Payment' : 'Admin Portal'
@@ -422,7 +468,7 @@ export default function App() {
         </header>
 
         <div className={cn(
-          activeView === 'drafting' ? "p-0 h-full" : "p-8 max-w-7xl mx-auto"
+          activeView === 'drafting' ? "p-0 h-full" : "px-6 pt-4 pb-10"
         )}>
           {renderView()}
         </div>
@@ -436,11 +482,11 @@ function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode, labe
     <button 
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all",
-        active ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+        "w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-left whitespace-nowrap",
+        active ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
       )}
     >
-      <span className={cn(active ? "text-white" : "text-slate-400")}>{icon}</span>
+      <span className={cn(active ? "text-indigo-600" : "text-slate-400")}>{icon}</span>
       {label}
     </button>
   );
@@ -451,8 +497,8 @@ function SubNavItem({ icon, label, active, onClick }: { icon: React.ReactNode, l
     <button 
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-3 pl-5 pr-4 py-2.5 rounded-xl text-sm font-bold transition-all",
-        active ? "text-indigo-600 bg-indigo-50/50" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+        "w-full flex items-center gap-3 pl-5 pr-4 py-2.5 rounded-xl text-sm font-bold transition-all text-left whitespace-nowrap",
+        active ? "text-indigo-600 bg-slate-100/50" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
       )}
     >
       <span className={cn(active ? "text-indigo-600" : "text-slate-400")}>{icon}</span>
