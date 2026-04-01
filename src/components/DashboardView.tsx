@@ -64,7 +64,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         <div onClick={() => setPipelineFilter('Drafting & Negotiation')}>
           <StatusCard 
             title="Drafting & Negotiation" 
-            value="6" 
+            value="3" 
             icon={<FileEdit size={18} className="text-indigo-600" />} 
             color="indigo"
             active={pipelineFilter === 'Drafting & Negotiation'}
@@ -73,7 +73,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         <div onClick={() => setPipelineFilter('Approval & Signature')}>
           <StatusCard 
             title="Approval & Signature" 
-            value="8" 
+            value="5" 
             icon={<PenTool size={18} className="text-amber-600" />} 
             color="amber"
             active={pipelineFilter === 'Approval & Signature'}
@@ -82,7 +82,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         <div onClick={() => setPipelineFilter('Payment Prep')}>
           <StatusCard 
             title="Payment Prep" 
-            value="3" 
+            value="2" 
             icon={<CreditCard size={18} className="text-blue-600" />} 
             color="blue"
             active={pipelineFilter === 'Payment Prep'}
@@ -91,7 +91,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         <div onClick={() => setPipelineFilter('Completed')}>
           <StatusCard 
             title="Completed" 
-            value="16" 
+            value="8" 
             icon={<Flag size={18} className="text-emerald-600" />} 
             color="emerald"
             active={pipelineFilter === 'Completed'}
@@ -131,8 +131,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                 if (pipelineFilter === 'All') return true;
                 if (pipelineFilter === 'Drafting & Negotiation') return contract.status === 'Drafting' || contract.status === 'Negotiation';
                 if (pipelineFilter === 'Approval & Signature') return contract.status === 'Internal Consultation' || contract.status === 'Legal Review' || contract.status === 'Finance Approval' || contract.status === 'Final Approval';
-                if (pipelineFilter === 'Payment Prep') return contract.status === 'Signed' || contract.status === 'Payment Ready';
-                if (pipelineFilter === 'Completed') return contract.status === 'Signed' || contract.status === 'Payment Ready'; // Simplified for mock
+                if (pipelineFilter === 'Payment Prep') return contract.status === 'Payment Ready';
+                if (pipelineFilter === 'Completed') return contract.status === 'Signed';
                 return true;
               })
               .map((contract) => {
@@ -141,15 +141,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
               
               // Map status to aligned summary card styles
               const getStatusConfig = (status: ContractStatus, risk: string) => {
-                if (status === 'Signed' || status === 'Payment Ready') {
+                if (status === 'Drafting' || status === 'Negotiation') {
                   return {
-                    icon: <CheckCircle2 size={20} />,
-                    color: 'emerald',
-                    bg: 'bg-emerald-50',
-                    text: 'text-emerald-600',
-                    border: 'border-emerald-100',
-                    badge: 'bg-emerald-100 text-emerald-700',
-                    label: 'Completed'
+                    icon: <FileEdit size={20} />,
+                    color: 'indigo',
+                    bg: 'bg-indigo-50',
+                    text: 'text-indigo-600',
+                    border: 'border-indigo-100',
+                    badge: 'bg-indigo-100 text-indigo-700',
+                    label: 'Active Negotiations'
                   };
                 }
                 if (risk === 'High') {
@@ -163,19 +163,30 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                     label: 'Stuck'
                   };
                 }
-                if (status === 'Drafting' || status === 'Negotiation') {
+                if (status === 'Payment Ready') {
                   return {
-                    icon: <Zap size={20} />,
-                    color: 'indigo',
-                    bg: 'bg-indigo-50',
-                    text: 'text-indigo-600',
-                    border: 'border-indigo-100',
-                    badge: 'bg-indigo-100 text-indigo-700',
-                    label: 'Active Negotiations'
+                    icon: <CreditCard size={20} />,
+                    color: 'blue',
+                    bg: 'bg-blue-50',
+                    text: 'text-blue-600',
+                    border: 'border-blue-100',
+                    badge: 'bg-blue-100 text-blue-700',
+                    label: 'Payment Prep'
+                  };
+                }
+                if (status === 'Signed') {
+                  return {
+                    icon: <Flag size={20} />,
+                    color: 'emerald',
+                    bg: 'bg-emerald-50',
+                    text: 'text-emerald-600',
+                    border: 'border-emerald-100',
+                    badge: 'bg-emerald-100 text-emerald-700',
+                    label: 'Completed'
                   };
                 }
                 return {
-                  icon: <Clock size={20} />,
+                  icon: <PenTool size={20} />,
                   color: 'amber',
                   bg: 'bg-amber-50',
                   text: 'text-amber-600',
@@ -401,24 +412,24 @@ function StatusCard({ title, value, icon, color, active }: {
   return (
     <div className={cn(
       "glass-card p-3 flex items-center gap-3 hover:shadow-md transition-all cursor-pointer group border-slate-100",
-      active ? "bg-indigo-900 border-indigo-900 shadow-lg shadow-indigo-100" : "hover:bg-white"
+      active 
+        ? (title === 'Drafting & Negotiation' ? "bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200" : "bg-slate-100 border-slate-300 shadow-inner")
+        : "hover:bg-white"
     )}>
       <div className={cn(
         "w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 relative transition-colors",
-        active ? "bg-indigo-800 border-indigo-700 text-white" : colorClasses[color]
+        colorClasses[color]
       )}>
-        <span className={cn("transition-colors", active ? "text-white" : "")}>{icon}</span>
+        {icon}
         <div className={cn(
-          "absolute -top-1.5 -right-1.5 w-5 h-5 border rounded-full flex items-center justify-center shadow-sm transition-colors",
-          active ? "bg-indigo-500 border-indigo-400 text-white" : "bg-white border-slate-100 text-slate-700"
+          "absolute -top-1.5 -right-1.5 w-5 h-5 border rounded-full flex items-center justify-center shadow-sm bg-white border-slate-100 text-slate-700"
         )}>
           <span className="text-[10px] font-bold">{value}</span>
         </div>
       </div>
       <div className="flex-1 min-w-0">
         <p className={cn(
-          "text-xs font-bold uppercase tracking-tight leading-tight transition-colors",
-          active ? "text-white" : "text-slate-800"
+          "text-xs font-bold uppercase tracking-tight leading-tight text-slate-800"
         )}>{title}</p>
       </div>
     </div>

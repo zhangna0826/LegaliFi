@@ -43,173 +43,31 @@ function cn(...inputs: ClassValue[]) {
 // Comprehensive Mock Data - Adjusted to match requested numbers:
 // 1 completed, 2 in approval, 3 waiting for signature, 1 overdue/stuck
 const MOCK_CONTRACTS: Contract[] = [
-  { 
-    id: '1', 
-    title: 'Influencer Campaign - TechVibe', 
-    partner: 'TechVibe Agency', 
-    amount: 12500, 
-    status: 'Legal Review', // In Approval 1
-    updatedAt: '2024-03-10T14:00:00Z', 
-    owner: 'Na Zhang', 
-    riskLevel: 'Medium',
-    versions: [
-      { id: 'v2', versionNumber: '2.0', author: 'Legal Team', timestamp: '2024-03-10T14:00:00Z', content: 'Standard indemnification applies.', changes: ['Updated liability clause'] },
-      { id: 'v1', versionNumber: '1.0', author: 'Erin Z.', timestamp: '2024-03-08T10:00:00Z', content: 'Initial draft.' }
-    ],
-    comments: [{ id: 'c1', author: 'Legal Team', text: 'Please check the payment terms.', timestamp: '2024-03-10T14:05:00Z' }],
-    deliverables: [{ id: 'd1', type: 'Link', url: 'https://instagram.com/p/abc', title: 'IG Post 1', status: 'Verified' }],
-    approvalPath: [
-      { role: 'Manager', name: 'David L.', status: 'Approved', estimatedDays: 1 },
-      { role: 'Legal', name: 'Sarah K.', status: 'Pending', estimatedDays: 3 },
-      { role: 'Finance', name: 'Mike R.', status: 'Pending', estimatedDays: 2 }
-    ]
-  },
-  { 
-    id: '2', 
-    title: 'SaaS Subscription Agreement', 
-    partner: 'CloudScale Inc.', 
-    amount: 4800, 
-    invoiceAmount: 4800,
-    status: 'Signed', // Stage 7/8
-    updatedAt: '2024-03-09T10:30:00Z', 
-    owner: 'Na Zhang', 
-    riskLevel: 'Low', 
-    paymentStatus: 'Paid',
-    versions: [{ id: 'v1', versionNumber: '1.0', author: 'Erin Z.', timestamp: '2024-03-09T10:30:00Z', content: 'Final signed version.' }],
-    comments: [],
-    deliverables: [],
-    approvalPath: [
-      { role: 'CEO', name: 'Robert C.', status: 'Pending', estimatedDays: 1 }
-    ]
-  },
-  { 
-    id: '3', 
-    title: 'Annual Event Sponsorship', 
-    partner: 'Global Events Ltd', 
-    amount: 25000, 
-    status: 'Negotiation', // Stage 2/8
-    updatedAt: '2024-03-11T09:15:00Z', 
-    owner: 'Na Zhang', 
-    riskLevel: 'High',
-    versions: [],
-    comments: [],
-    deliverables: [{ id: 'd1', type: 'Link', url: 'https://events.com/sponsor', title: 'Logo Placement', status: 'Pending' }],
-    approvalPath: [
-      { role: 'Legal', name: 'James W.', status: 'Pending', estimatedDays: 5 }
-    ]
-  },
-  { 
-    id: '4', 
-    title: 'Content Production Master Agreement', 
-    partner: 'CreativeFlow', 
-    amount: 8000, 
-    status: 'Finance Approval', // Stage 5/8
-    updatedAt: '2024-03-10T16:45:00Z', 
-    owner: 'Erin Z.', 
-    riskLevel: 'Low',
-    versions: [],
-    comments: [],
-    deliverables: [],
-    approvalPath: [
-      { role: 'Finance', name: 'Mike R.', status: 'Pending', estimatedDays: 2 }
-    ]
-  },
-  { 
-    id: '5', 
-    title: 'Ad Placement - Q2', 
-    partner: 'SocialAds', 
-    amount: 15000, 
-    status: 'Final Approval', // Stage 6/8
-    updatedAt: '2024-03-11T11:00:00Z', 
-    owner: 'Erin Z.', 
-    riskLevel: 'Low',
-    versions: [],
-    comments: [],
-    deliverables: [],
-    approvalPath: [
-      { role: 'VP Marketing', name: 'Sarah J.', status: 'Pending', estimatedDays: 1 }
-    ]
-  },
-  { 
-    id: '6', 
-    title: 'Office Rental Extension', 
-    partner: 'PropGroup', 
-    amount: 32000, 
-    status: 'Final Approval', // Stage 6/8
-    updatedAt: '2024-03-11T12:00:00Z', 
-    owner: 'Erin Z.', 
-    riskLevel: 'Low',
-    versions: [],
-    comments: [],
-    deliverables: [],
-    approvalPath: [
-      { role: 'VP Marketing', name: 'Sarah J.', status: 'Pending', estimatedDays: 1 }
-    ]
-  },
-  { 
-    id: '7', 
-    title: 'Strategic Partnership MOU', 
-    partner: 'TechGiant Co', 
-    amount: 0, 
-    status: 'Signed', // Stage 7/8
-    updatedAt: '2024-03-12T09:00:00Z', 
-    owner: 'Erin Z.', 
-    riskLevel: 'Low',
-    versions: [],
-    comments: [],
-    deliverables: [],
-    approvalPath: [
-      { role: 'CEO', name: 'Robert C.', status: 'Pending', estimatedDays: 1 }
-    ]
-  },
-  { 
-    id: '8', 
-    title: 'New Vendor Onboarding', 
-    partner: 'SupplyChain Pro', 
-    amount: 5000, 
-    status: 'Drafting', // Stage 1/8
-    updatedAt: '2024-03-13T10:00:00Z', 
-    owner: 'Erin Z.', 
-    riskLevel: 'Low',
-    versions: [],
-    comments: [],
-    deliverables: [],
-    approvalPath: [
-      { role: 'Owner', name: 'Erin Z.', status: 'Pending', estimatedDays: 1 }
-    ]
-  },
-  { 
-    id: '9', 
-    title: 'Consulting Services Agreement', 
-    partner: 'Expertise LLC', 
-    amount: 12000, 
-    status: 'Internal Consultation', // Stage 3/8
-    updatedAt: '2024-03-12T14:00:00Z', 
-    owner: 'Erin Z.', 
-    riskLevel: 'Low',
-    versions: [],
-    comments: [],
-    deliverables: [],
-    approvalPath: [
-      { role: 'Manager', name: 'David L.', status: 'Pending', estimatedDays: 2 }
-    ]
-  },
-  { 
-    id: '10', 
-    title: 'Software License Renewal', 
-    partner: 'SoftSystems', 
-    amount: 9500, 
-    status: 'Payment Ready', // Stage 8/8
-    updatedAt: '2024-03-13T08:30:00Z', 
-    owner: 'Erin Z.', 
-    riskLevel: 'Low',
-    versions: [],
-    comments: [],
-    deliverables: [],
-    approvalPath: [
-      { role: 'Finance', name: 'Mike R.', status: 'Pending', estimatedDays: 1 }
-    ]
-  }
+  // Drafting & Negotiation (3 items)
+  { id: '1', title: 'Contract A', partner: 'Company A', amount: 12500, status: 'Drafting', updatedAt: '2024-03-10T14:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '2', title: 'Contract B', partner: 'Company B', amount: 4800, status: 'Negotiation', updatedAt: '2024-03-09T10:30:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '3', title: 'Contract C', partner: 'Company C', amount: 25000, status: 'Negotiation', updatedAt: '2024-03-11T09:15:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  
+  // Approval & Signature (5 items)
+  { id: '4', title: 'Contract D', partner: 'Company D', amount: 8000, status: 'Legal Review', updatedAt: '2024-03-10T16:45:00Z', owner: 'Erin Z.', riskLevel: 'High', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Legal', name: 'James W.', status: 'Pending', estimatedDays: 5 }] },
+  { id: '5', title: 'Contract E', partner: 'Company E', amount: 15000, status: 'Finance Approval', updatedAt: '2024-03-11T11:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '6', title: 'Contract F', partner: 'Company F', amount: 32000, status: 'Final Approval', updatedAt: '2024-03-11T12:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '7', title: 'Contract G', partner: 'Company G', amount: 50000, status: 'Internal Consultation', updatedAt: '2024-03-12T09:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '8', title: 'Contract H', partner: 'Company H', amount: 5000, status: 'Legal Review', updatedAt: '2024-03-13T10:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  
+  // Payment Prep (2 items)
+  { id: '9', title: 'Contract I', partner: 'Company I', amount: 12000, status: 'Payment Ready', updatedAt: '2024-03-12T14:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '10', title: 'Contract J', partner: 'Company J', amount: 9500, status: 'Payment Ready', updatedAt: '2024-03-13T08:30:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  
+  // Completed (8 items)
+  { id: '11', title: 'Contract K', partner: 'Company K', amount: 10000, status: 'Signed', updatedAt: '2024-03-01T10:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '12', title: 'Contract L', partner: 'Company L', amount: 20000, status: 'Signed', updatedAt: '2024-03-02T11:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '13', title: 'Contract M', partner: 'Company M', amount: 30000, status: 'Signed', updatedAt: '2024-03-03T12:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '14', title: 'Contract N', partner: 'Company N', amount: 40000, status: 'Signed', updatedAt: '2024-03-04T13:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '15', title: 'Contract O', partner: 'Company O', amount: 50000, status: 'Signed', updatedAt: '2024-03-05T14:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '16', title: 'Contract P', partner: 'Company P', amount: 60000, status: 'Signed', updatedAt: '2024-03-06T15:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '17', title: 'Contract Q', partner: 'Company Q', amount: 70000, status: 'Signed', updatedAt: '2024-03-07T16:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '18', title: 'Contract R', partner: 'Company R', amount: 80000, status: 'Signed', updatedAt: '2024-03-08T17:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] }
 ];
 
 const PERFORMANCE_METRICS: MetricData[] = [
@@ -354,7 +212,7 @@ export default function App() {
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto py-4">
           <button 
             onClick={handleCreateContract}
-            className="w-full flex items-center justify-start gap-3 mb-6 px-4 py-3 bg-indigo-900 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-slate-800 transition-all active:scale-95"
+            className="w-full flex items-center justify-start gap-3 mb-6 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-900 transition-all active:scale-95 whitespace-nowrap"
           >
             <Plus size={20} />
             <span>Create New Contract</span>
@@ -390,7 +248,7 @@ export default function App() {
                 <SubNavItem 
                   icon={<FileEdit size={14} />}
                   label="Drafts" 
-                  active={activeView === 'drafts-list'} 
+                  active={activeView === 'drafts-list' || activeView === 'drafting'} 
                   onClick={() => setActiveView('drafts-list')} 
                 />
                 <SubNavItem 
@@ -427,48 +285,50 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        <header className="h-14 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-10">
-          <div className="flex items-center gap-4">
-            <h1 className="text-base font-bold text-slate-800">{
-              activeView === 'dashboard' ? 'Dashboard Overview' : 
-              activeView === 'all-contracts' ? 'All Contracts' :
-              activeView === 'drafts-list' ? 'Draft Contracts' :
-              activeView === 'negotiations-list' ? 'Active Negotiations' :
-              activeView === 'create-contract' ? 'Create New Contract' :
-              activeView === 'drafting' ? 'Contract Drafting' :
-              activeView === 'negotiation' ? 'Negotiation & Versions' :
-              activeView === 'approval' ? 'Approval Workflow' :
-              activeView === 'payment' ? 'Deliverables & Payment' : 'Admin Portal'
-            }</h1>
-            {activeView === 'drafting' && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-lg border border-indigo-100">
-                <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">New Vendor Onboarding</span>
-                <button className="text-indigo-400 hover:text-indigo-600"><X size={12} /></button>
-              </div>
-            )}
-            {selectedContract && (activeView === 'negotiation' || activeView === 'approval' || activeView === 'payment') && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-full border border-indigo-100">
-                <span className="text-xs font-bold text-indigo-600 truncate max-w-[200px]">{selectedContract.title}</span>
-                <button onClick={() => setSelectedContract(null)} className="text-indigo-400 hover:text-indigo-600"><X size={14} /></button>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input type="text" placeholder="Search contracts, partners..." className="pl-10 pr-4 py-1.5 bg-slate-100 border-transparent rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all w-64" />
+      <main className="flex-1 overflow-y-auto flex flex-col">
+        {activeView !== 'drafting' && (
+          <header className="h-14 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-4 sticky top-0 z-10 shrink-0">
+            <div className="flex items-center gap-4">
+              <h1 className="text-base font-bold text-slate-800">{
+                activeView === 'dashboard' ? 'Dashboard Overview' : 
+                activeView === 'all-contracts' ? 'All Contracts' :
+                activeView === 'drafts-list' ? 'Draft Contracts' :
+                activeView === 'negotiations-list' ? 'Active Negotiations' :
+                activeView === 'create-contract' ? 'Create New Contract' :
+                activeView === 'drafting' ? 'Contract Drafting' :
+                activeView === 'negotiation' ? 'Negotiation & Versions' :
+                activeView === 'approval' ? 'Approval Workflow' :
+                activeView === 'payment' ? 'Deliverables & Payment' : 'Admin Portal'
+              }</h1>
+              {activeView === 'drafting' && (
+                <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-lg border border-indigo-100">
+                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">New Vendor Onboarding</span>
+                  <button className="text-indigo-400 hover:text-indigo-600"><X size={12} /></button>
+                </div>
+              )}
+              {selectedContract && (activeView === 'negotiation' || activeView === 'approval' || activeView === 'payment') && (
+                <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-full border border-indigo-100">
+                  <span className="text-xs font-bold text-indigo-600 truncate max-w-[200px]">{selectedContract.title}</span>
+                  <button onClick={() => setSelectedContract(null)} className="text-indigo-400 hover:text-indigo-600"><X size={14} /></button>
+                </div>
+              )}
             </div>
-            <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full relative">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-          </div>
-        </header>
+            
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input type="text" placeholder="Search contracts, partners..." className="pl-10 pr-4 py-1.5 bg-slate-100 border-transparent rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all w-64" />
+              </div>
+              <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full relative">
+                <Bell size={20} />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+              </button>
+            </div>
+          </header>
+        )}
 
         <div className={cn(
-          activeView === 'drafting' ? "p-0 h-full" : "px-6 pt-4 pb-10"
+          activeView === 'drafting' ? "p-0 flex-1 overflow-hidden" : "px-6 pt-4 pb-10"
         )}>
           {renderView()}
         </div>

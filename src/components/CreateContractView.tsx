@@ -27,7 +27,7 @@ export const CreateContractView: React.FC<CreateContractViewProps> = ({ onBack, 
 
 **BETWEEN:**
 
-(1) **ISU MCN LIMITED**, a company incorporated in [Jurisdiction] with its registered office at [Address] (the "**Company**"); and
+(1) **ISU Tech**, a company incorporated in [Jurisdiction] with its registered office at [Address] (the "**Company**"); and
 
 (2) **[INFLUENCER NAME]**, an individual residing at [Address] (the "**Influencer**").
 
@@ -64,7 +64,7 @@ export const CreateContractView: React.FC<CreateContractViewProps> = ({ onBack, 
 
 **IN WITNESS WHEREOF**, the parties have executed this Agreement as of the date first above written.
 
-**For ISU MCN LIMITED:**
+**For ISU Tech:**
 __________________________
 Name: [Name]
 Title: [Title]
@@ -104,7 +104,6 @@ Name: [Influencer Name]
           </button>
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Create New Contract</h1>
-            <p className="text-sm text-slate-500 mt-1">Select a starting point for your new agreement</p>
           </div>
         </div>
 
@@ -122,7 +121,7 @@ Name: [Influencer Name]
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 mb-3">Upload Contract</h2>
                 <p className="text-sm text-slate-500 leading-relaxed mb-8">
-                  Already have a draft? Upload your existing document (Word or PDF) to start reviewing and editing with LegaliFi.
+                  Upload your existing document to start reviewing and editing with LegaliFi.
                 </p>
                 
                 <input 
@@ -155,9 +154,9 @@ Name: [Influencer Name]
                 <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform duration-500">
                   <Building2 size={28} />
                 </div>
-                <h2 className="text-xl font-bold text-slate-800 mb-3">ISU MCN Templates</h2>
+                <h2 className="text-xl font-bold text-slate-800 mb-3">ISU Tech</h2>
                 <p className="text-sm text-slate-500 leading-relaxed mb-6">
-                  Select from pre-approved templates curated by your legal department for ISU MCN operations.
+                  Select from ISU Tech's pre-approved templates.
                 </p>
                 
                 <div className="space-y-3">
@@ -190,9 +189,9 @@ Name: [Influencer Name]
                 <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform duration-500">
                   <Sparkles size={28} />
                 </div>
-                <h2 className="text-xl font-bold text-slate-800 mb-3">Legalifi Professional</h2>
+                <h2 className="text-xl font-bold text-slate-800 mb-3">LegaliFi Templates</h2>
                 <p className="text-sm text-slate-500 leading-relaxed mb-6">
-                  Use our library of industry-standard professional templates, fully editable and AI-optimized.
+                  Use our library of industry-standard professional templates.
                 </p>
                 
                 <div className="space-y-3">

@@ -5,6 +5,7 @@ export interface Comment {
   author: string;
   text: string;
   timestamp: string;
+  replies?: Comment[];
 }
 
 export interface Version {

@@ -4,10 +4,10 @@ import {
   ChevronLeft, ChevronRight, Download, Eye, 
   Bold, Italic, Underline, List, AlignLeft, 
   AlignCenter, AlignRight, MessageSquare, 
-  Info, Flag, Layers, Users, Bot, X, Check,
+  Info, Flag, Users, Bot, X, Check,
   MoreHorizontal, Trash2, Reply, Search,
   Minus, Plus, Type as TypeIcon, FileUp, FileDown,
-  Paperclip, Highlighter, ListOrdered, Quote
+  Highlighter, ListOrdered, Quote, Bell, History
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
@@ -78,13 +78,15 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
       id: 'c1',
       author: 'Sarah J.',
       text: 'Is the contract value inclusive of taxes?',
-      timestamp: '2024-03-13T10:30:00Z'
-    },
-    {
-      id: 'c2',
-      author: 'Na Zhang',
-      text: 'I will check with the finance team.',
-      timestamp: '2024-03-13T10:45:00Z'
+      timestamp: '2024-03-13T10:30:00Z',
+      replies: [
+        {
+          id: 'c2',
+          author: 'Na Zhang',
+          text: 'I will check with the finance team.',
+          timestamp: '2024-03-13T10:45:00Z'
+        }
+      ]
     }
   ]);
 
@@ -133,7 +135,10 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <h2 className="font-bold text-slate-800 truncate max-w-[300px]">{initialTitle || 'Office Supplies Procurement Agreement.docx'}</h2>
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded uppercase">Drafting</span>
+              <div className="flex items-center gap-1.5">
+                <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded">Drafting</span>
+                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded">Negotiating</span>
+              </div>
             </div>
             <span className="text-[10px] text-slate-400">V1.0 • Auto-saved at 18:55</span>
           </div>
@@ -145,6 +150,10 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
           <div className="h-4 w-px bg-slate-200 mx-1" />
           <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-600">
             <Download size={18} />
+          </button>
+          <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full relative">
+            <Bell size={18} />
+            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
           </button>
           <button className="bg-indigo-600 text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-indigo-700 transition-all shadow-md">
             Next Step
@@ -192,39 +201,6 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar Icons */}
-        <div className="w-14 bg-white border-r border-slate-200 flex flex-col items-center py-4 gap-6">
-          <SidebarIconButton 
-            icon={<Info size={20} />} 
-            active={activeTab === 'details'} 
-            onClick={() => setActiveTab('details')} 
-            color="text-blue-500"
-          />
-          <SidebarIconButton 
-            icon={<MessageSquare size={20} />} 
-            active={activeTab === 'comments'} 
-            onClick={() => setActiveTab('comments')} 
-            badge={comments.length}
-            color="text-indigo-500"
-          />
-          <SidebarIconButton 
-            icon={<Paperclip size={20} />} 
-            active={activeTab === 'files'} 
-            onClick={() => setActiveTab('files')} 
-            color="text-amber-500"
-          />
-          <SidebarIconButton 
-            icon={<Bot size={20} />} 
-            active={activeTab === 'risks'} 
-            onClick={() => setActiveTab('risks')} 
-            isAi
-            badge={risks.filter(r => r.status === 'Pending').length}
-            color="text-red-500"
-          />
-          <div className="flex-1" />
-          <SidebarIconButton icon={<Layers size={20} />} onClick={() => {}} color="text-slate-400" />
-        </div>
-
         {/* Editor Area */}
         <div className="flex-1 bg-slate-100 overflow-hidden flex flex-col">
           <div className="flex-1 overflow-y-auto p-0 md:p-2 flex justify-center custom-scrollbar">
@@ -239,23 +215,31 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
               <div className="absolute top-[420px] left-12 right-12 h-8 bg-indigo-100/50 -z-0 pointer-events-none" />
             </div>
           </div>
-          
-          {/* Word Status Bar (Word-like) */}
-          <div className="h-7 bg-indigo-600 text-white flex items-center justify-between px-4 text-[10px] font-medium shrink-0">
-            <div className="flex items-center gap-4">
-              <span>Page 1 of 1</span>
-              <span>{content.split(/\s+/).filter(Boolean).length} Words</span>
-              <div className="h-3 w-px bg-white/30" />
-              <span className="flex items-center gap-1"><Check size={10} /> Accessibility: Good</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span>English (United States)</span>
-              <div className="flex items-center gap-2">
-                <LayoutIcon size={12} />
-                <BookOpenIcon size={12} />
-              </div>
-            </div>
-          </div>
+        </div>
+
+        {/* Sidebar Icons (Moved to right) */}
+        <div className="w-14 bg-white border-l border-slate-200 flex flex-col items-center py-4 gap-6">
+          <SidebarIconButton 
+            icon={<Info size={20} />} 
+            active={activeTab === 'details'} 
+            onClick={() => setActiveTab('details')} 
+            color="text-blue-500"
+          />
+          <SidebarIconButton 
+            icon={<MessageSquare size={20} />} 
+            active={activeTab === 'comments'} 
+            onClick={() => setActiveTab('comments')} 
+            badge={comments.length}
+            color="text-indigo-500"
+          />
+          <SidebarIconButton 
+            icon={<Bot size={20} />} 
+            active={activeTab === 'risks'} 
+            onClick={() => setActiveTab('risks')} 
+            isAi
+            badge={risks.filter(r => r.status === 'Pending').length}
+            color="text-red-500"
+          />
         </div>
 
         {/* Right Sidebar Panel */}
@@ -269,29 +253,22 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
           >
             {activeTab === 'details' && (
               <div className="p-6 flex flex-col h-full">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-slate-800">Review & Edit Details</h3>
                   <button onClick={() => setActiveTab('details')} className="text-slate-400 hover:text-slate-600">
                     <X size={18} />
                   </button>
                 </div>
                 
-                <div className="space-y-6 overflow-y-auto pr-2">
-                  <div className="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
-                    <div className="flex items-center gap-2 text-indigo-700 mb-1">
-                      <Sparkles size={14} />
-                      <span className="text-[10px] font-bold uppercase tracking-wider">AI-Assisted</span>
-                    </div>
-                    <p className="text-[10px] text-indigo-600 leading-tight">
-                      Accepting or editing values will not change anything in the agreement document itself.
-                    </p>
-                  </div>
-
-                  <DetailField label="Agreement Type" value="Master Service Agreement" isSelect />
-                  <div className="h-px bg-slate-100" />
+                <button className="flex items-center gap-2 mb-6 text-[10px] font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+                  <History size={14} />
+                  VIEW VERSION HISTORY
+                </button>
+                
+                <div className="space-y-3 overflow-y-auto pr-2">
                   <DetailField label="Title" value="Office Supplies Procurement Agreement" />
                   <DetailField label="Buyer (Party A)" value="Fontara" />
-                  <DetailField label="Supplier (Party B)" value="Stellar Logical Software" />
+                  <DetailField label="Seller (Party B)" value="Stellar Logical Software" />
                   <DetailField label="Total Contract Value" value="$450,000.00 USD" />
                   <DetailField label="Effective Date" value="2025-07-01" />
                 </div>
@@ -320,12 +297,36 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
                         <span className="text-[10px] text-slate-400">10:30</span>
                       </div>
                       <p className="text-xs text-slate-600 leading-relaxed">{comment.text}</p>
-                      <div className="mt-3 flex items-center gap-3">
-                        <button className="text-[10px] font-bold text-indigo-600 flex items-center gap-1">
-                          <Reply size={12} /> Reply
-                        </button>
-                        <button className="text-[10px] font-bold text-slate-400">Resolve</button>
-                      </div>
+                      
+                      {/* Replies */}
+                      {comment.replies && comment.replies.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-slate-200 space-y-4">
+                          {comment.replies.map((reply) => (
+                            <div key={reply.id} className="pl-4 border-l-2 border-indigo-200">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs font-bold text-slate-800">{reply.author}</span>
+                                <span className="text-[10px] text-slate-400">10:45</span>
+                              </div>
+                              <p className="text-xs text-slate-600 leading-relaxed">{reply.text}</p>
+                              <div className="mt-2 flex items-center gap-3">
+                                <button className="text-[10px] font-bold text-indigo-600 flex items-center gap-1">
+                                  <Reply size={12} /> Reply
+                                </button>
+                                <button className="text-[10px] font-bold text-slate-400">Resolve</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {!comment.replies || comment.replies.length === 0 ? (
+                        <div className="mt-3 flex items-center gap-3">
+                          <button className="text-[10px] font-bold text-indigo-600 flex items-center gap-1">
+                            <Reply size={12} /> Reply
+                          </button>
+                          <button className="text-[10px] font-bold text-slate-400">Resolve</button>
+                        </div>
+                      ) : null}
                     </div>
                   ))}
                 </div>
@@ -450,6 +451,23 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Word Status Bar (Word-like) - Moved to very bottom */}
+      <div className="h-7 bg-indigo-600 text-white flex items-center justify-between px-4 text-[10px] font-medium shrink-0 z-20">
+        <div className="flex items-center gap-4">
+          <span>Page {Math.max(1, Math.ceil(content.length / 3000))} of {Math.max(1, Math.ceil(content.length / 3000))}</span>
+          <span>{content.trim() ? content.trim().split(/\s+/).length : 0} Words</span>
+          <div className="h-3 w-px bg-white/30" />
+          <span className="flex items-center gap-1"><Check size={10} /> Accessibility: Good</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span>English (United States)</span>
+          <div className="flex items-center gap-2">
+            <LayoutIcon size={12} />
+            <BookOpenIcon size={12} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -500,16 +518,11 @@ function BookOpenIcon({ size }: { size: number }) {
 
 function DetailField({ label, value, isSelect }: { label: string, value: string, isSelect?: boolean }) {
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-0.5">
       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</label>
-      <div className="flex items-center gap-2">
-        <div className="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 flex items-center justify-between">
-          <span className="truncate">{value}</span>
-          {isSelect && <ChevronRight size={14} className="text-slate-400" />}
-        </div>
-        <button className="p-2.5 bg-white border border-slate-200 rounded-xl text-emerald-600 hover:bg-emerald-50 transition-colors">
-          <Check size={16} />
-        </button>
+      <div className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700 flex items-center justify-between">
+        <span className="truncate">{value}</span>
+        {isSelect && <ChevronRight size={14} className="text-slate-400" />}
       </div>
     </div>
   );
