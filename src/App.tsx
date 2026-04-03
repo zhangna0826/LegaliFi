@@ -20,7 +20,8 @@ import {
   Zap,
   ChevronDown,
   ChevronRight,
-  FileEdit
+  FileEdit,
+  FileStack
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -44,7 +45,7 @@ function cn(...inputs: ClassValue[]) {
 // 1 completed, 2 in approval, 3 waiting for signature, 1 overdue/stuck
 const MOCK_CONTRACTS: Contract[] = [
   // Drafting & Negotiation (3 items)
-  { id: '1', title: 'Contract A', partner: 'Company A', amount: 12500, status: 'Negotiation', updatedAt: '2026-03-24T17:37:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '1', title: 'Contract A', partner: 'Company A', amount: 12500, status: 'Drafting', updatedAt: '2026-03-24T17:37:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   { id: '2', title: 'Contract B', partner: 'Company B', amount: 4800, status: 'Drafting', updatedAt: '2026-03-25T14:15:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   { id: '3', title: 'Contract C', partner: 'Company C', amount: 25000, status: 'Negotiation', updatedAt: '2026-03-26T18:48:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   
@@ -64,10 +65,10 @@ const MOCK_CONTRACTS: Contract[] = [
   { id: '12', title: 'Contract L', partner: 'Company L', amount: 20000, status: 'Signed', updatedAt: '2026-03-18T23:15:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   { id: '13', title: 'Contract M', partner: 'Company M', amount: 30000, status: 'Signed', updatedAt: '2026-03-15T14:50:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   { id: '14', title: 'Contract N', partner: 'Company N', amount: 40000, status: 'Signed', updatedAt: '2026-03-10T21:30:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '15', title: 'Contract O', partner: 'Company O', amount: 50000, status: 'Signed', updatedAt: '2026-03-05T14:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '16', title: 'Contract P', partner: 'Company P', amount: 60000, status: 'Signed', updatedAt: '2026-03-06T15:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '17', title: 'Contract Q', partner: 'Company Q', amount: 70000, status: 'Signed', updatedAt: '2024-03-07T16:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '18', title: 'Contract R', partner: 'Company R', amount: 80000, status: 'Signed', updatedAt: '2024-03-08T17:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] }
+  { id: '15', title: 'Contract O', partner: 'Company O', amount: 6500, status: 'Signed', updatedAt: '2026-03-08T14:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '16', title: 'Contract P', partner: 'Company P', amount: 22000, status: 'Signed', updatedAt: '2026-03-05T15:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '17', title: 'Contract Q', partner: 'Company Q', amount: 15500, status: 'Signed', updatedAt: '2026-02-28T16:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '18', title: 'Contract R', partner: 'Company R', amount: 8200, status: 'Signed', updatedAt: '2026-02-25T17:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] }
 ];
 
 const PERFORMANCE_METRICS: MetricData[] = [
@@ -246,7 +247,7 @@ export default function App() {
                   onClick={() => setActiveView('all-contracts')} 
                 />
                 <SubNavItem 
-                  icon={<History size={14} />}
+                  icon={<FileStack size={14} />}
                   label="Contract Templates" 
                   active={activeView === 'templates'} 
                   onClick={() => {}} 
