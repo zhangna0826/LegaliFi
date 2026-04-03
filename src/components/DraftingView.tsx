@@ -155,7 +155,7 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
             <Bell size={18} />
             <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-red-500 rounded-full border border-white"></span>
           </button>
-          <button className="bg-indigo-600 text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-indigo-700 transition-all shadow-md">
+          <button className="bg-indigo-600 text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-indigo-900 transition-all shadow-md">
             Next Step
           </button>
         </div>
@@ -212,7 +212,7 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
                 placeholder="Start typing your contract..."
               />
               {/* Mock Highlight for Comment */}
-              <div className="absolute top-[420px] left-12 right-12 h-8 bg-indigo-100/50 -z-0 pointer-events-none" />
+              <div className="absolute top-[420px] left-12 right-12 h-8 bg-indigo-50/50 -z-0 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -223,14 +223,14 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
             icon={<Info size={20} />} 
             active={activeTab === 'details'} 
             onClick={() => setActiveTab('details')} 
-            color="text-blue-500"
+            color="text-indigo-600"
           />
           <SidebarIconButton 
             icon={<MessageSquare size={20} />} 
             active={activeTab === 'comments'} 
             onClick={() => setActiveTab('comments')} 
             badge={comments.length}
-            color="text-indigo-500"
+            color="text-indigo-600"
           />
           <SidebarIconButton 
             icon={<Bot size={20} />} 
@@ -336,7 +336,7 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
                     <input 
                       type="text" 
                       placeholder="Add a comment..." 
-                      className="w-full p-3 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                      className="w-full p-3 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-600 outline-none"
                     />
                     <button className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-600">
                       <Send size={16} />
@@ -427,7 +427,7 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
                           </p>
                         </div>
                         <div className="flex gap-2">
-                          <button className="flex-1 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-700 transition-colors">
+                          <button className="flex-1 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-900 transition-colors">
                             Apply Fix
                           </button>
                           <button className="px-3 py-1.5 border border-slate-200 text-slate-500 rounded-lg text-[10px] font-bold hover:bg-slate-50">
@@ -453,7 +453,7 @@ This Office Supplies Procurement Agreement ("Agreement") is entered into effecti
       </div>
 
       {/* Word Status Bar (Word-like) - Moved to very bottom */}
-      <div className="h-7 bg-indigo-600 text-white flex items-center justify-between px-4 text-[10px] font-medium shrink-0 z-20">
+      <div className="h-7 bg-indigo-900 text-white flex items-center justify-between px-4 text-[10px] font-medium shrink-0 z-20">
         <div className="flex items-center gap-4">
           <span>Page {Math.max(1, Math.ceil(content.length / 3000))} of {Math.max(1, Math.ceil(content.length / 3000))}</span>
           <span>{content.trim() ? content.trim().split(/\s+/).length : 0} Words</span>

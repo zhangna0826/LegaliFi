@@ -25,9 +25,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
   const [showAiModal, setShowAiModal] = useState(false);
 
   const [tasks, setTasks] = useState([
-    { id: 1, title: "Nudge Required", subtitle: "Global Events - Stuck for 5 days", time: "2h ago", icon: <Clock size={16} className="text-red-500" /> },
-    { id: 2, title: "New Comment", subtitle: "TechVibe - Legal needs clarification", time: "5h ago", icon: <MessageSquare size={16} className="text-blue-500" /> },
-    { id: 3, title: "Urgent Edit", subtitle: "CloudScale - Version conflict", time: "Yesterday", icon: <AlertCircle size={16} className="text-amber-500" /> },
+    { id: 1, title: "Nudge Required", subtitle: "Contract D - Stuck for 3 days", time: "2h ago", icon: <Clock size={16} className="text-amber-500" /> },
+    { id: 2, title: "Nudge Required", subtitle: "Contract F - Stuck for 4 days", time: "1h ago", icon: <Clock size={16} className="text-amber-500" /> },
+    { id: 3, title: "New Comment", subtitle: "Contract C - Legal needs clarification", time: "5h ago", icon: <MessageSquare size={16} className="text-amber-500" /> },
+    { id: 4, title: "Urgent Edit", subtitle: "Contract A - Version conflict", time: "Yesterday", icon: <AlertCircle size={16} className="text-amber-500" /> },
   ]);
 
   const [completingId, setCompletingId] = useState<number | null>(null);
@@ -49,14 +50,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
   return (
     <div className="space-y-4">
       {/* Hero Section - Inspired by DocuSign/Feishu */}
-      <div className="relative overflow-hidden bg-indigo-900 rounded-2xl p-6 text-white shadow-xl">
+      <div className="relative overflow-hidden bg-indigo-900 rounded-2xl p-8 text-white shadow-xl">
         <div className="relative z-10 max-w-2xl">
-          <h2 className="text-2xl font-bold mb-1">Welcome back, Na Zhang</h2>
-          <p className="text-indigo-100 mb-0 text-base font-medium">Your AI copilot for safer contracts.</p>
+          <p className="text-amber-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-2">Contract Intelligence Platform</p>
+          <h2 className="text-4xl font-bold mb-2 tracking-tight">Welcome back, Na Zhang</h2>
+          <p className="text-indigo-100/70 text-base font-medium">
+            Your AI copilot has identified <span className="text-white font-bold">4 items</span> needing attention today.
+          </p>
         </div>
         {/* Decorative background elements */}
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-indigo-500/20 to-transparent" />
-        <Zap className="absolute -bottom-8 -right-8 w-64 h-64 text-indigo-500/10 rotate-12" />
+        <Zap className="absolute -bottom-8 -right-8 w-64 h-64 text-white/5 rotate-12" />
       </div>
 
       {/* Status Summary Cards - Compact Version */}
@@ -79,13 +83,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
             active={pipelineFilter === 'Approval & Signature'}
           />
         </div>
-        <div onClick={() => setPipelineFilter('Payment Prep')}>
+        <div onClick={() => setPipelineFilter('Payment Preparation')}>
           <StatusCard 
-            title="Payment Prep" 
+            title="Payment Preparation" 
             value="2" 
             icon={<CreditCard size={18} className="text-blue-600" />} 
             color="blue"
-            active={pipelineFilter === 'Payment Prep'}
+            active={pipelineFilter === 'Payment Preparation'}
           />
         </div>
         <div onClick={() => setPipelineFilter('Completed')}>
@@ -108,7 +112,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
             </h3>
             
             <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 no-scrollbar">
-              <select className="bg-slate-50 border border-slate-200 text-[10px] font-bold text-slate-600 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+              <select className="bg-slate-50 border border-slate-200 text-[10px] font-bold text-slate-600 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-600 transition-all">
                 <option>Last 7 Days</option>
                 <option>Last 30 Days</option>
                 <option>All Time</option>
@@ -118,7 +122,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                 onClick={() => setPipelineFilter('All')}
                 className={cn(
                   "px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all",
-                  pipelineFilter === 'All' ? "bg-indigo-600 text-white shadow-sm" : "bg-slate-50 text-slate-500 hover:bg-slate-100"
+                  pipelineFilter === 'All' ? "bg-indigo-900 text-white shadow-sm" : "bg-slate-50 text-slate-500 hover:bg-slate-100"
                 )}
               >
                 Show All
@@ -130,9 +134,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
               .filter(contract => {
                 if (pipelineFilter === 'All') return true;
                 if (pipelineFilter === 'Drafting & Negotiation') return contract.status === 'Drafting' || contract.status === 'Negotiation';
-                if (pipelineFilter === 'Approval & Signature') return contract.status === 'Internal Consultation' || contract.status === 'Legal Review' || contract.status === 'Finance Approval' || contract.status === 'Final Approval';
-                if (pipelineFilter === 'Payment Prep') return contract.status === 'Payment Ready';
-                if (pipelineFilter === 'Completed') return contract.status === 'Signed';
+                if (pipelineFilter === 'Approval & Signature') return contract.status === 'Internal Consultation' || contract.status === 'Legal Review' || contract.status === 'Finance Approval' || contract.status === 'Final Approval' || contract.id === '8';
+                if (pipelineFilter === 'Payment Preparation') return contract.status === 'Payment Ready';
+                if (pipelineFilter === 'Completed') return contract.status === 'Signed' && contract.id !== '8';
                 return true;
               })
               .map((contract) => {
@@ -140,8 +144,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
               const currentApprover = contract.approvalPath?.find(p => p.status === 'Pending')?.name;
               
               // Map status to aligned summary card styles
-              const getStatusConfig = (status: ContractStatus, risk: string) => {
+              const getStatusConfig = (status: ContractStatus, risk: string, contractId: string) => {
                 if (status === 'Drafting' || status === 'Negotiation') {
+                  let label = 'DRAFTING';
+                  if (contractId === '2') {
+                    label = 'IN REVIEW';
+                  } else if (contractId === '3') {
+                    label = 'NEGOTIATING';
+                  }
+                  
                   return {
                     icon: <FileEdit size={20} />,
                     color: 'indigo',
@@ -149,7 +160,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                     text: 'text-indigo-600',
                     border: 'border-indigo-100',
                     badge: 'bg-indigo-100 text-indigo-700',
-                    label: 'Active Negotiations'
+                    label: label
                   };
                 }
                 if (risk === 'High') {
@@ -160,21 +171,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                     text: 'text-red-600',
                     border: 'border-red-100',
                     badge: 'bg-red-100 text-red-700',
-                    label: 'Stuck'
-                  };
-                }
-                if (status === 'Payment Ready') {
-                  return {
-                    icon: <CreditCard size={20} />,
-                    color: 'blue',
-                    bg: 'bg-blue-50',
-                    text: 'text-blue-600',
-                    border: 'border-blue-100',
-                    badge: 'bg-blue-100 text-blue-700',
-                    label: 'Payment Prep'
+                    label: 'STUCK'
                   };
                 }
                 if (status === 'Signed') {
+                  if (pipelineFilter === 'Approval & Signature' || contractId === '8') {
+                    return {
+                      icon: <PenTool size={20} />,
+                      color: 'emerald',
+                      bg: 'bg-emerald-50',
+                      text: 'text-emerald-600',
+                      border: 'border-emerald-100',
+                      badge: 'bg-emerald-100 text-emerald-700',
+                      label: 'SIGNING'
+                    };
+                  }
                   return {
                     icon: <Flag size={20} />,
                     color: 'emerald',
@@ -182,7 +193,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                     text: 'text-emerald-600',
                     border: 'border-emerald-100',
                     badge: 'bg-emerald-100 text-emerald-700',
-                    label: 'Completed'
+                    label: 'COMPLETED'
+                  };
+                }
+                if (status === 'Payment Ready') {
+                  let label = 'PAYMENT PREPARATION';
+                  if (contractId === '9') label = 'MANAGER REVIEW';
+                  if (contractId === '10') label = 'EVIDENCE COLLECTION';
+                  return {
+                    icon: <CreditCard size={20} />,
+                    color: 'blue',
+                    bg: 'bg-blue-50',
+                    text: 'text-blue-600',
+                    border: 'border-blue-100',
+                    badge: 'bg-blue-100 text-blue-700',
+                    label: label
                   };
                 }
                 return {
@@ -192,11 +217,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                   text: 'text-amber-600',
                   border: 'border-amber-100',
                   badge: 'bg-amber-100 text-amber-700',
-                  label: 'In Approval'
+                  label: 'IN APPROVAL'
                 };
               };
 
-              const config = getStatusConfig(contract.status, contract.riskLevel || 'Low');
+              const config = getStatusConfig(contract.status, contract.riskLevel || 'Low', contract.id);
               
               return (
                 <div key={contract.id} className="flex items-start gap-4 group cursor-pointer" onClick={() => onSelectContract(contract)}>
@@ -204,7 +229,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                     <div className={cn(
                       "w-10 h-10 rounded-xl flex items-center justify-center border transition-all",
                       config.bg, config.text, config.border,
-                      config.label === 'Stuck' && "animate-pulse"
+                      config.label === 'STUCK' && "animate-pulse"
                     )}>
                       {config.icon}
                     </div>
@@ -226,16 +251,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                       )}
                     </div>
                     {/* Timeline Progress Bar */}
-                    <div className="relative h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                      <div 
-                        className={cn("h-full transition-all duration-1000", config.label === 'Stuck' ? 'bg-red-500' : 'bg-indigo-500')}
-                        style={{ width: `${(currentStageIndex + 1) / STAGES.length * 100}%` }}
-                      />
-                    </div>
+                    {config.label !== 'DRAFTING' && config.label !== 'IN REVIEW' && config.label !== 'NEGOTIATING' && config.label !== 'COMPLETED' && (
+                      <div className="relative h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div 
+                          className={cn("h-full transition-all duration-1000", 
+                            config.label === 'STUCK' ? 'bg-red-500' : 
+                            config.label === 'SIGNING' ? 'bg-emerald-500' : 'bg-indigo-600'
+                          )}
+                          style={{ 
+                            width: (() => {
+                              if (config.label === 'STUCK' || config.label === 'IN APPROVAL') {
+                                if (contract.id === '4') return '75%';
+                                if (contract.id === '5') return '40%';
+                                if (contract.id === '6') return '50%';
+                                if (contract.id === '7') return '37.5%';
+                              }
+                              if (config.label === 'SIGNING') return '100%';
+                              if (config.label === 'PAYMENT PREPARATION' || config.label === 'MANAGER REVIEW' || config.label === 'EVIDENCE COLLECTION') {
+                                if (contract.id === '9') return '50%';
+                                if (contract.id === '10') return '25%';
+                              }
+                              return `${(currentStageIndex + 1) / STAGES.length * 100}%`;
+                            })()
+                          }}
+                        />
+                      </div>
+                    )}
                     <div className="flex justify-between items-center mt-2">
                       <div className="flex items-center gap-4">
-                        <span className="text-[10px] text-slate-400">Updated at {format(new Date(contract.updatedAt), 'MM-dd HH:mm')}</span>
-                        {config.label === 'Stuck' && (
+                        <span className="text-[10px] text-slate-400">
+                          {config.label === 'COMPLETED' ? 'Completed at' : 'Updated at'} {format(new Date(contract.updatedAt), 'MM-dd hh:mm a')}
+                        </span>
+                        {config.label === 'STUCK' && (
                           <div className="flex items-center gap-2">
                             <button 
                               onClick={(e) => { e.stopPropagation(); }}
@@ -251,8 +298,35 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                         )}
                       </div>
                       <span className="text-[10px] font-bold text-slate-500">
-                        Stage {currentStageIndex + 1} / {STAGES.length}
-                        {currentApprover && <span className="ml-2 text-indigo-600">Current: {currentApprover}</span>}
+                        {(() => {
+                          if (config.label === 'DRAFTING' || config.label === 'IN REVIEW' || config.label === 'NEGOTIATING' || config.label === 'COMPLETED') {
+                            return null;
+                          }
+                          if (config.label === 'IN APPROVAL' || config.label === 'STUCK') {
+                            let x = 1, y = 4;
+                            if (contract.id === '4') { x = 3; y = 4; }
+                            else if (contract.id === '5') { x = 2; y = 5; }
+                            else if (contract.id === '6') { x = 4; y = 8; }
+                            else if (contract.id === '7') { x = 3; y = 8; }
+                            return `Step ${x} of ${y}`;
+                          }
+                          if (config.label === 'SIGNING') {
+                            return `Step 5 of 5`;
+                          }
+                          if (config.label === 'PAYMENT PREPARATION' || config.label === 'MANAGER REVIEW' || config.label === 'EVIDENCE COLLECTION') {
+                            let x = 1, y = 4;
+                            if (contract.id === '9') { x = 2; y = 4; }
+                            return (
+                              <span className="flex items-center gap-2">
+                                <span>Step {x} of {y}</span>
+                              </span>
+                            );
+                          }
+                          return `Stage ${currentStageIndex + 1} / ${STAGES.length}`;
+                        })()}
+                        {(config.label === 'IN APPROVAL' || config.label === 'STUCK') && currentApprover && (
+                          <span className="ml-2 text-indigo-600">Current: {currentApprover}</span>
+                        )}
                       </span>
                     </div>
                   </div>
@@ -306,8 +380,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
       </div>
       {/* Floating AI Assistant Button */}
       <button 
-        onClick={() => setShowAiModal(true)}
-        className="fixed bottom-8 right-8 bg-indigo-500 text-white px-6 py-4 rounded-full shadow-2xl shadow-indigo-200 flex items-center gap-3 hover:bg-indigo-600 hover:scale-105 transition-all z-50 group"
+        onClick={() => {}}
+        className="fixed bottom-8 right-8 bg-indigo-900 text-white px-6 py-4 rounded-full shadow-2xl shadow-indigo-200 flex items-center gap-3 hover:bg-indigo-800 hover:scale-105 transition-all z-50 group"
       >
         <div className="relative">
           <Sparkles size={20} className="group-hover:rotate-12 transition-transform" />
@@ -341,7 +415,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                   <X size={20} />
                 </button>
                 <div className="flex items-center gap-4 mb-2">
-                  <div className="w-12 h-12 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
                     <Bot className="text-white" size={24} />
                   </div>
                   <div>
@@ -359,7 +433,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                 </div>
                 
                 <div className="grid grid-cols-1 gap-2">
-                  <button className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left group">
+                  <button className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all text-left group">
                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
                       <Wand2 size={16} className="text-slate-500 group-hover:text-indigo-600" />
                     </div>
@@ -368,7 +442,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                       <p className="text-[10px] text-slate-500">For Global Logistics Agreement</p>
                     </div>
                   </button>
-                  <button className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left group">
+                  <button className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-indigo-600 hover:bg-indigo-50 transition-all text-left group">
                     <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
                       <Search size={16} className="text-slate-500 group-hover:text-indigo-600" />
                     </div>
@@ -383,9 +457,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                   <input 
                     type="text" 
                     placeholder="Ask me anything about your contracts..." 
-                    className="w-full pl-4 pr-12 py-3 bg-slate-100 border-transparent rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all"
+                    className="w-full pl-4 pr-12 py-3 bg-slate-100 border-transparent rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 transition-all"
                   />
-                  <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center hover:bg-indigo-700 transition-colors">
+                  <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-indigo-900 text-white rounded-lg flex items-center justify-center hover:bg-indigo-800 transition-colors">
                     <Send size={16} />
                   </button>
                 </div>
@@ -413,7 +487,7 @@ function StatusCard({ title, value, icon, color, active }: {
     <div className={cn(
       "glass-card p-3 flex items-center gap-3 hover:shadow-md transition-all cursor-pointer group border-slate-100",
       active 
-        ? (title === 'Drafting & Negotiation' ? "bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200" : "bg-slate-100 border-slate-300 shadow-inner")
+        ? "bg-indigo-50 border-indigo-200 shadow-sm ring-1 ring-indigo-200"
         : "hover:bg-white"
     )}>
       <div className={cn(

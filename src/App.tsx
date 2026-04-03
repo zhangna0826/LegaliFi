@@ -44,28 +44,28 @@ function cn(...inputs: ClassValue[]) {
 // 1 completed, 2 in approval, 3 waiting for signature, 1 overdue/stuck
 const MOCK_CONTRACTS: Contract[] = [
   // Drafting & Negotiation (3 items)
-  { id: '1', title: 'Contract A', partner: 'Company A', amount: 12500, status: 'Drafting', updatedAt: '2024-03-10T14:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '2', title: 'Contract B', partner: 'Company B', amount: 4800, status: 'Negotiation', updatedAt: '2024-03-09T10:30:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '3', title: 'Contract C', partner: 'Company C', amount: 25000, status: 'Negotiation', updatedAt: '2024-03-11T09:15:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '1', title: 'Contract A', partner: 'Company A', amount: 12500, status: 'Negotiation', updatedAt: '2026-03-24T17:37:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '2', title: 'Contract B', partner: 'Company B', amount: 4800, status: 'Drafting', updatedAt: '2026-03-25T14:15:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '3', title: 'Contract C', partner: 'Company C', amount: 25000, status: 'Negotiation', updatedAt: '2026-03-26T18:48:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   
   // Approval & Signature (5 items)
-  { id: '4', title: 'Contract D', partner: 'Company D', amount: 8000, status: 'Legal Review', updatedAt: '2024-03-10T16:45:00Z', owner: 'Erin Z.', riskLevel: 'High', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Legal', name: 'James W.', status: 'Pending', estimatedDays: 5 }] },
-  { id: '5', title: 'Contract E', partner: 'Company E', amount: 15000, status: 'Finance Approval', updatedAt: '2024-03-11T11:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '6', title: 'Contract F', partner: 'Company F', amount: 32000, status: 'Final Approval', updatedAt: '2024-03-11T12:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '7', title: 'Contract G', partner: 'Company G', amount: 50000, status: 'Internal Consultation', updatedAt: '2024-03-12T09:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '8', title: 'Contract H', partner: 'Company H', amount: 5000, status: 'Legal Review', updatedAt: '2024-03-13T10:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '4', title: 'Contract D', partner: 'Company D', amount: 8000, status: 'Legal Review', updatedAt: '2026-03-25T15:22:00Z', owner: 'Erin Z.', riskLevel: 'High', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Legal', name: 'James W.', status: 'Pending', estimatedDays: 5 }] },
+  { id: '5', title: 'Contract E', partner: 'Company E', amount: 15000, status: 'Finance Approval', updatedAt: '2026-03-26T21:45:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Finance', name: 'Lisa M.', status: 'Pending', estimatedDays: 2 }] },
+  { id: '6', title: 'Contract F', partner: 'Company F', amount: 32000, status: 'Final Approval', updatedAt: '2026-03-24T16:10:00Z', owner: 'Erin Z.', riskLevel: 'High', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'CEO', name: 'James W.', status: 'Pending', estimatedDays: 3 }] },
+  { id: '7', title: 'Contract G', partner: 'Company G', amount: 50000, status: 'Internal Consultation', updatedAt: '2026-03-26T13:30:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Strategy', name: 'Rachel K.', status: 'Pending', estimatedDays: 4 }] },
+  { id: '8', title: 'Contract H', partner: 'Company H', amount: 18000, status: 'Signed', updatedAt: '2026-03-26T22:05:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   
   // Payment Prep (2 items)
-  { id: '9', title: 'Contract I', partner: 'Company I', amount: 12000, status: 'Payment Ready', updatedAt: '2024-03-12T14:00:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '10', title: 'Contract J', partner: 'Company J', amount: 9500, status: 'Payment Ready', updatedAt: '2024-03-13T08:30:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '9', title: 'Contract I', partner: 'Company I', amount: 12000, status: 'Payment Ready', updatedAt: '2026-03-25T23:20:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '10', title: 'Contract J', partner: 'Company J', amount: 9500, status: 'Payment Ready', updatedAt: '2026-03-26T15:45:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   
   // Completed (8 items)
-  { id: '11', title: 'Contract K', partner: 'Company K', amount: 10000, status: 'Signed', updatedAt: '2024-03-01T10:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '12', title: 'Contract L', partner: 'Company L', amount: 20000, status: 'Signed', updatedAt: '2024-03-02T11:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '13', title: 'Contract M', partner: 'Company M', amount: 30000, status: 'Signed', updatedAt: '2024-03-03T12:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '14', title: 'Contract N', partner: 'Company N', amount: 40000, status: 'Signed', updatedAt: '2024-03-04T13:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '15', title: 'Contract O', partner: 'Company O', amount: 50000, status: 'Signed', updatedAt: '2024-03-05T14:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
-  { id: '16', title: 'Contract P', partner: 'Company P', amount: 60000, status: 'Signed', updatedAt: '2024-03-06T15:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '11', title: 'Contract K', partner: 'Company K', amount: 10000, status: 'Signed', updatedAt: '2026-03-20T16:30:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '12', title: 'Contract L', partner: 'Company L', amount: 20000, status: 'Signed', updatedAt: '2026-03-18T23:15:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '13', title: 'Contract M', partner: 'Company M', amount: 30000, status: 'Signed', updatedAt: '2026-03-15T14:50:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '14', title: 'Contract N', partner: 'Company N', amount: 40000, status: 'Signed', updatedAt: '2026-03-10T21:30:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '15', title: 'Contract O', partner: 'Company O', amount: 50000, status: 'Signed', updatedAt: '2026-03-05T14:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  { id: '16', title: 'Contract P', partner: 'Company P', amount: 60000, status: 'Signed', updatedAt: '2026-03-06T15:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   { id: '17', title: 'Contract Q', partner: 'Company Q', amount: 70000, status: 'Signed', updatedAt: '2024-03-07T16:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   { id: '18', title: 'Contract R', partner: 'Company R', amount: 80000, status: 'Signed', updatedAt: '2024-03-08T17:00:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] }
 ];
@@ -196,23 +196,23 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-[#f8f9fa]">
+    <div className="flex h-screen bg-slate-50">
       {/* Sidebar */}
       <aside className="w-[240px] bg-white border-r border-slate-200 flex flex-col">
         <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 relative">
+          <div className="w-10 h-10 bg-indigo-900 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100 relative">
             <FileText className="text-white w-6 h-6" />
             <div className="absolute -bottom-1 -right-1 bg-emerald-500 rounded-full p-0.5 border-2 border-white">
               <ShieldCheck className="text-white w-3 h-3" />
             </div>
           </div>
-          <span className="font-bold text-2xl tracking-tight text-slate-800">LegaliFi</span>
+          <span className="font-bold text-2xl tracking-tight text-indigo-900">LegaliFi</span>
         </div>
 
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto py-4">
           <button 
             onClick={handleCreateContract}
-            className="w-full flex items-center justify-start gap-3 mb-6 px-4 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-900 transition-all active:scale-95 whitespace-nowrap"
+            className="w-full flex items-center justify-start gap-3 mb-6 px-4 py-3 bg-indigo-900 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-800 transition-all active:scale-95 whitespace-nowrap"
           >
             <Plus size={20} />
             <span>Create New Contract</span>
@@ -246,16 +246,10 @@ export default function App() {
                   onClick={() => setActiveView('all-contracts')} 
                 />
                 <SubNavItem 
-                  icon={<FileEdit size={14} />}
-                  label="Drafts" 
-                  active={activeView === 'drafts-list' || activeView === 'drafting'} 
-                  onClick={() => setActiveView('drafts-list')} 
-                />
-                <SubNavItem 
                   icon={<History size={14} />}
                   label="Contract Templates" 
                   active={activeView === 'templates'} 
-                  onClick={() => setActiveView('templates')} 
+                  onClick={() => {}} 
                 />
               </div>
             )}
@@ -263,12 +257,13 @@ export default function App() {
 
           <div className="pt-4">
             <p className="px-4 py-2.5 text-sm font-bold text-slate-400 uppercase tracking-wider">Workflows</p>
-            <NavItem icon={<MessageSquare size={18} />} label="Approval Tracking" active={activeView === 'approval'} onClick={() => setActiveView('approval')} />
-            <NavItem icon={<CreditCard size={18} />} label="Payment Prep" active={activeView === 'payment'} onClick={() => setActiveView('payment')} />
+            <NavItem icon={<FileEdit size={18} />} label="Drafting & Negotiation" active={activeView === 'negotiation'} onClick={() => setActiveView('negotiation')} />
+            <NavItem icon={<MessageSquare size={18} />} label="Approval & Signature" active={activeView === 'approval'} onClick={() => setActiveView('approval')} />
+            <NavItem icon={<CreditCard size={18} />} label="Payment Preparation" active={activeView === 'payment'} onClick={() => setActiveView('payment')} />
           </div>
 
           <div className="pt-4 mt-4 border-t border-slate-100">
-            <NavItem icon={<ShieldCheck size={18} />} label="Admin Portal" active={activeView === 'admin'} onClick={() => setActiveView('admin')} />
+            <NavItem icon={<ShieldCheck size={18} />} label="Admin Portal" active={activeView === 'admin'} onClick={() => {}} />
           </div>
         </nav>
 
@@ -301,9 +296,9 @@ export default function App() {
                 activeView === 'payment' ? 'Deliverables & Payment' : 'Admin Portal'
               }</h1>
               {activeView === 'drafting' && (
-                <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-lg border border-indigo-100">
-                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">New Vendor Onboarding</span>
-                  <button className="text-indigo-400 hover:text-indigo-600"><X size={12} /></button>
+                <div className="flex items-center gap-2 px-3 py-1 bg-indigo-900 rounded-lg border border-indigo-800">
+                  <span className="text-[10px] font-bold text-white uppercase tracking-wider">New Vendor Onboarding</span>
+                  <button className="text-indigo-200 hover:text-white"><X size={12} /></button>
                 </div>
               )}
               {selectedContract && (activeView === 'negotiation' || activeView === 'approval' || activeView === 'payment') && (
@@ -317,7 +312,7 @@ export default function App() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <input type="text" placeholder="Search contracts, partners..." className="pl-10 pr-4 py-1.5 bg-slate-100 border-transparent rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all w-64" />
+                <input type="text" placeholder="Search contracts, partners..." className="pl-10 pr-4 py-1.5 bg-slate-100 border-transparent rounded-full text-sm focus:bg-white focus:ring-2 focus:ring-indigo-600 transition-all w-64" />
               </div>
               <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full relative">
                 <Bell size={20} />
@@ -343,7 +338,7 @@ function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode, labe
       onClick={onClick}
       className={cn(
         "w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-left whitespace-nowrap",
-        active ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+        active ? "bg-slate-100 text-indigo-900" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
       )}
     >
       <span className={cn(active ? "text-indigo-600" : "text-slate-400")}>{icon}</span>
@@ -358,7 +353,7 @@ function SubNavItem({ icon, label, active, onClick }: { icon: React.ReactNode, l
       onClick={onClick}
       className={cn(
         "w-full flex items-center gap-3 pl-5 pr-4 py-2.5 rounded-xl text-sm font-bold transition-all text-left whitespace-nowrap",
-        active ? "text-indigo-600 bg-slate-100/50" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+        active ? "text-indigo-900 bg-slate-100/50" : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
       )}
     >
       <span className={cn(active ? "text-indigo-600" : "text-slate-400")}>{icon}</span>

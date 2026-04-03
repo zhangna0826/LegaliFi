@@ -134,7 +134,7 @@ Name: [Influencer Name]
                 
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-bold text-sm hover:bg-indigo-800 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
                 >
                   <FileUp size={18} />
                   Choose File to Upload
@@ -205,13 +205,13 @@ Name: [Influencer Name]
                         <p className="text-xs font-bold text-slate-700">{t.title}</p>
                         <p className="text-[10px] text-slate-400 mt-0.5">{t.description}</p>
                       </div>
-                      <ChevronRight size={14} className="text-slate-300 group-hover/item:text-indigo-500 group-hover/item:translate-x-1 transition-all" />
+                      <ChevronRight size={14} className="text-slate-300 group-hover/item:text-indigo-600 group-hover/item:translate-x-1 transition-all" />
                     </button>
                   ))}
                 </div>
               </div>
               <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex items-center gap-2">
-                <Check size={14} className="text-indigo-500" />
+                <Check size={14} className="text-indigo-600" />
                 <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Industry Standard</span>
               </div>
             </div>

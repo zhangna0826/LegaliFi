@@ -286,7 +286,7 @@ export const ApprovalView: React.FC<ApprovalViewProps> = ({ contract }) => {
                                 onClick={handleNudge}
                                 className={cn(
                                   "px-3 py-1 rounded-md text-[9px] font-bold transition-all shadow-sm active:scale-95 flex items-center gap-1",
-                                  isDelayed ? "bg-red-600 text-white hover:bg-red-700" : "bg-indigo-600 text-white hover:bg-indigo-700"
+                                  isDelayed ? "bg-red-600 text-white hover:bg-red-700" : "bg-blue-600 text-white hover:bg-indigo-900"
                                 )}
                               >
                                 <Zap size={10} fill="currentColor" />
@@ -307,7 +307,7 @@ export const ApprovalView: React.FC<ApprovalViewProps> = ({ contract }) => {
         {/* Footer Actions */}
         <div className="px-5 py-3 bg-white border-t border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button className="px-5 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition-all shadow-sm active:scale-95">
+            <button className="px-5 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-900 transition-all shadow-sm active:scale-95">
               Seal
             </button>
             <button className="px-5 py-1.5 bg-white border border-indigo-200 text-indigo-600 rounded-lg text-xs font-bold hover:bg-indigo-50 transition-all active:scale-95">

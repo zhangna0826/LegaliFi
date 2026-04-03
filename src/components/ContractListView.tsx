@@ -26,7 +26,7 @@ export const ContractListView: React.FC<ContractListViewProps> = ({
   const getStatusIcon = (status: ContractStatus) => {
     switch (status) {
       case 'Drafting': return <FileText size={16} className="text-slate-400" />;
-      case 'Negotiation': return <Zap size={16} className="text-indigo-500" />;
+      case 'Negotiation': return <Zap size={16} className="text-indigo-600" />;
       case 'Signed': return <CheckCircle2 size={16} className="text-emerald-500" />;
       default: return <Clock size={16} className="text-amber-500" />;
     }
@@ -43,7 +43,7 @@ export const ContractListView: React.FC<ContractListViewProps> = ({
         </div>
         <button 
           onClick={onNewContract}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-900 transition-all shadow-lg shadow-indigo-100"
         >
           <Plus size={18} />
           Create New Contract
@@ -76,7 +76,7 @@ export const ContractListView: React.FC<ContractListViewProps> = ({
                         <FileText size={18} />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-800">{contract.title}</p>
+                        <p className="text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">{contract.title}</p>
                         <p className="text-[10px] text-slate-400">ID: {contract.id}</p>
                       </div>
                     </div>
