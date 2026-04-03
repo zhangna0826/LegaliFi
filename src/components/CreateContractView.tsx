@@ -5,6 +5,7 @@ import {
   ArrowLeft, Upload, Check, Info
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { cn } from '../lib/utils';
 
 interface CreateContractViewProps {
   onBack: () => void;
@@ -20,7 +21,8 @@ export const CreateContractView: React.FC<CreateContractViewProps> = ({ onBack, 
     { 
       id: 'isu-1', 
       title: 'Influencer Cooperation Agreement', 
-      description: 'Standard agreement for MCN influencer partnerships.', 
+      description: 'Standard agreement for MCN influencer partnerships', 
+      interactive: true,
       content: `# INFLUENCER COOPERATION AGREEMENT
 
 **THIS AGREEMENT** is made on this [Date] (the "Effective Date")
@@ -74,21 +76,18 @@ __________________________
 Name: [Influencer Name]
 ` 
     },
-    { id: 'isu-2', title: 'Live Streaming Service Contract', description: 'Terms for live streaming events and commissions.', content: '# Live Streaming Service Contract\n\nScope of services for live streaming...' },
-    { id: 'isu-3', title: 'Brand Sponsorship Agreement', description: 'Agreement for brand placement and promotion.', content: '# Brand Sponsorship Agreement\n\nBrand promotion terms and conditions...' },
+    { id: 'isu-2', title: 'Template B', description: 'Company template', interactive: false },
+    { id: 'isu-3', title: 'Template C', description: 'Company template', interactive: false },
   ];
 
   const legalifiTemplates = [
-    { id: 'lg-1', title: 'Master Service Agreement (MSA)', description: 'Comprehensive framework for ongoing services.', content: '# Master Service Agreement\n\nGeneral terms and conditions for services...' },
-    { id: 'lg-2', title: 'Non-Disclosure Agreement (NDA)', description: 'Standard confidentiality agreement.', content: '# Non-Disclosure Agreement\n\nConfidentiality terms...' },
-    { id: 'lg-3', title: 'Employment Contract', description: 'Standard terms for new hires.', content: '# Employment Contract\n\nTerms of employment...' },
+    { id: 'lg-1', title: 'Template D', description: 'Professional template', interactive: false },
+    { id: 'lg-2', title: 'Template E', description: 'Professional template', interactive: false },
+    { id: 'lg-3', title: 'Template F', description: 'Professional template', interactive: false },
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      onUpload(file);
-    }
+    // Disabled for prototype
   };
 
   return (
@@ -109,32 +108,19 @@ Name: [Influencer Name]
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Module 1: Upload */}
-          <div 
-            className="lg:col-span-1"
-            onMouseEnter={() => setHoveredModule('upload')}
-            onMouseLeave={() => setHoveredModule(null)}
-          >
-            <div className="h-full bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-500 overflow-hidden flex flex-col group">
+          <div className="lg:col-span-1">
+            <div className="h-full bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
               <div className="p-8 flex-1">
-                <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform duration-500">
+                <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-6">
                   <Upload size={28} />
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 mb-3">Upload Contract</h2>
                 <p className="text-sm text-slate-500 leading-relaxed mb-8">
-                  Upload your existing document to start reviewing and editing with LegaliFi.
+                  Upload your existing document
                 </p>
                 
-                <input 
-                  type="file" 
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden" 
-                  accept=".doc,.docx,.pdf,.txt,.md"
-                />
-                
                 <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-bold text-sm hover:bg-indigo-800 transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-indigo-900 text-white rounded-2xl font-bold text-sm hover:bg-indigo-800 shadow-lg shadow-indigo-100 transition-all active:scale-95 flex items-center justify-center gap-2"
                 >
                   <FileUp size={18} />
                   Choose File to Upload
@@ -147,14 +133,16 @@ Name: [Influencer Name]
             </div>
           </div>
 
-          {/* Module 2: Company Templates */}
+          {/* Module 2: ISU Tech */}
           <div className="lg:col-span-1">
             <div className="h-full bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-emerald-200 transition-all duration-500 overflow-hidden flex flex-col group">
               <div className="p-8 flex-1">
                 <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform duration-500">
                   <Building2 size={28} />
                 </div>
-                <h2 className="text-xl font-bold text-slate-800 mb-3">ISU Tech</h2>
+                <h2 className="text-xl font-bold text-slate-800 mb-3 flex items-center gap-2">
+                  ISU Tech <span className="text-xs font-normal text-slate-500">(Your Company)</span>
+                </h2>
                 <p className="text-sm text-slate-500 leading-relaxed mb-6">
                   Select from ISU Tech's pre-approved templates.
                 </p>
@@ -163,14 +151,19 @@ Name: [Influencer Name]
                   {companyTemplates.map((t) => (
                     <button 
                       key={t.id}
-                      onClick={() => onSelectTemplate(t.content, t.title)}
-                      className="w-full p-3 rounded-xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30 text-left transition-all flex items-center justify-between group/item"
+                      onClick={() => t.interactive && t.content && onSelectTemplate(t.content, t.title)}
+                      className={cn(
+                        "w-full p-3 rounded-xl border transition-all flex items-center justify-between group/item text-left",
+                        t.interactive 
+                          ? "border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30" 
+                          : "border-slate-50 bg-slate-50/30 opacity-50 cursor-default"
+                      )}
                     >
                       <div>
                         <p className="text-xs font-bold text-slate-700">{t.title}</p>
                         <p className="text-[10px] text-slate-400 mt-0.5">{t.description}</p>
                       </div>
-                      <ChevronRight size={14} className="text-slate-300 group-hover/item:text-emerald-500 group-hover/item:translate-x-1 transition-all" />
+                      {t.interactive && <ChevronRight size={14} className="text-slate-300 group-hover/item:text-emerald-500 group-hover/item:translate-x-1 transition-all" />}
                     </button>
                   ))}
                 </div>
@@ -182,36 +175,35 @@ Name: [Influencer Name]
             </div>
           </div>
 
-          {/* Module 3: Legalifi Templates */}
+          {/* Module 3: LegaliFi Templates */}
           <div className="lg:col-span-1">
-            <div className="h-full bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-200 transition-all duration-500 overflow-hidden flex flex-col group">
+            <div className="h-full bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
               <div className="p-8 flex-1">
-                <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 group-hover:scale-110 transition-transform duration-500">
+                <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6">
                   <Sparkles size={28} />
                 </div>
                 <h2 className="text-xl font-bold text-slate-800 mb-3">LegaliFi Templates</h2>
                 <p className="text-sm text-slate-500 leading-relaxed mb-6">
-                  Use our library of industry-standard professional templates.
+                  Prebuilt professional templates
                 </p>
                 
                 <div className="space-y-3">
                   {legalifiTemplates.map((t) => (
                     <button 
                       key={t.id}
-                      onClick={() => onSelectTemplate(t.content, t.title)}
-                      className="w-full p-3 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/30 text-left transition-all flex items-center justify-between group/item"
+                      disabled
+                      className="w-full p-3 rounded-xl border border-slate-50 bg-slate-50/30 opacity-50 text-left cursor-default flex items-center justify-between"
                     >
                       <div>
                         <p className="text-xs font-bold text-slate-700">{t.title}</p>
                         <p className="text-[10px] text-slate-400 mt-0.5">{t.description}</p>
                       </div>
-                      <ChevronRight size={14} className="text-slate-300 group-hover/item:text-indigo-600 group-hover/item:translate-x-1 transition-all" />
                     </button>
                   ))}
                 </div>
               </div>
               <div className="px-8 py-4 bg-slate-50 border-t border-slate-100 flex items-center gap-2">
-                <Check size={14} className="text-indigo-600" />
+                <Check size={14} className="text-indigo-500" />
                 <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Industry Standard</span>
               </div>
             </div>
@@ -221,10 +213,9 @@ Name: [Influencer Name]
         {/* Secondary Option: Blank Document */}
         <div className="mt-12 flex justify-center">
           <button 
-            onClick={() => onSelectTemplate('', 'Untitled Contract')}
-            className="flex items-center gap-2 px-6 py-3 text-slate-400 hover:text-slate-600 transition-colors group"
+            className="flex items-center gap-2 px-6 py-3 text-slate-500 hover:text-slate-800 transition-colors"
           >
-            <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+            <Plus size={18} />
             <span className="text-sm font-medium">Or start from a blank document</span>
           </button>
         </div>
