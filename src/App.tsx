@@ -79,7 +79,7 @@ const PERFORMANCE_METRICS: MetricData[] = [
   { name: 'Error Rate', baseline: 5, goal: 1 },
 ];
 
-type ViewType = 'dashboard' | 'drafting' | 'negotiation' | 'approval' | 'payment' | 'admin' | 'all-contracts' | 'drafts-list' | 'negotiations-list' | 'create-contract';
+type ViewType = 'dashboard' | 'drafting' | 'negotiation' | 'approval' | 'payment' | 'admin' | 'all-contracts' | 'drafts-list' | 'negotiations-list' | 'create-contract' | 'workflow-drafting' | 'workflow-approval' | 'workflow-payment';
 
 export default function App() {
   const [activeView, setActiveView] = useState<ViewType>('dashboard');
@@ -176,7 +176,50 @@ export default function App() {
           initialContent={draftingContent} 
           initialTitle={draftingTitle} 
           onBack={() => setActiveView('create-contract')} 
+          onNext={() => setActiveView('negotiation')}
+          onSendForApproval={() => {
+            // In a real app, we'd update the contract status in the backend
+            // Here we just navigate to the approval workflow list
+            setActiveView('workflow-approval');
+          }}
         />;
+      case 'workflow-drafting':
+        return (
+          <ContractListView 
+            title="Drafting & Negotiation"
+            contracts={MOCK_CONTRACTS.filter(c => ['Drafting', 'Negotiation'].includes(c.status))}
+            onSelectContract={(c) => {
+              setSelectedContract(c);
+              if (c.status === 'Drafting') setActiveView('drafting');
+              else setActiveView('negotiation');
+            }}
+            onNewContract={handleCreateContract}
+          />
+        );
+      case 'workflow-approval':
+        return (
+          <ContractListView 
+            title="Approval & Signature"
+            contracts={MOCK_CONTRACTS.filter(c => ['Legal Review', 'Finance Approval', 'Final Approval', 'Internal Consultation', 'IN APPROVAL'].includes(c.status))}
+            onSelectContract={(c) => {
+              setSelectedContract(c);
+              setActiveView('approval');
+            }}
+            onNewContract={handleCreateContract}
+          />
+        );
+      case 'workflow-payment':
+        return (
+          <ContractListView 
+            title="Payment Preparation"
+            contracts={MOCK_CONTRACTS.filter(c => ['Payment Ready', 'Signed'].includes(c.status))}
+            onSelectContract={(c) => {
+              setSelectedContract(c);
+              setActiveView('payment');
+            }}
+            onNewContract={handleCreateContract}
+          />
+        );
       case 'negotiation':
         return selectedContract ? <NegotiationView contract={selectedContract} /> : <div className="p-12 text-center text-slate-400">Please select a contract from the dashboard to view negotiation history.</div>;
       case 'approval':
@@ -213,7 +256,7 @@ export default function App() {
         <nav className="flex-1 px-4 space-y-1 overflow-y-auto py-4">
           <button 
             onClick={handleCreateContract}
-            className="w-full flex items-center justify-start gap-3 mb-6 px-4 py-3 bg-indigo-900 text-white rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-800 transition-all active:scale-95 whitespace-nowrap"
+            className="w-full flex items-center justify-start gap-3 mb-6 px-4 py-3 bg-indigo-900 text-white rounded-xl font-bold shadow-lg shadow-indigo-900/20 hover:bg-indigo-950 transition-all active:scale-95 whitespace-nowrap"
           >
             <Plus size={20} />
             <span>Create New Contract</span>
@@ -258,9 +301,9 @@ export default function App() {
 
           <div className="pt-4">
             <p className="px-4 py-2.5 text-sm font-bold text-slate-400 uppercase tracking-wider">Workflows</p>
-            <NavItem icon={<FileEdit size={18} />} label="Drafting & Negotiation" active={activeView === 'negotiation'} onClick={() => setActiveView('negotiation')} />
-            <NavItem icon={<MessageSquare size={18} />} label="Approval & Signature" active={activeView === 'approval'} onClick={() => setActiveView('approval')} />
-            <NavItem icon={<CreditCard size={18} />} label="Payment Preparation" active={activeView === 'payment'} onClick={() => setActiveView('payment')} />
+            <NavItem icon={<FileEdit size={18} />} label="Drafting & Negotiation" active={activeView === 'workflow-drafting'} onClick={() => setActiveView('workflow-drafting')} />
+            <NavItem icon={<MessageSquare size={18} />} label="Approval & Signature" active={activeView === 'workflow-approval'} onClick={() => setActiveView('workflow-approval')} />
+            <NavItem icon={<CreditCard size={18} />} label="Payment Preparation" active={activeView === 'workflow-payment'} onClick={() => setActiveView('workflow-payment')} />
           </div>
 
           <div className="pt-4 mt-4 border-t border-slate-100">
@@ -290,6 +333,9 @@ export default function App() {
                 activeView === 'all-contracts' ? 'All Contracts' :
                 activeView === 'drafts-list' ? 'Draft Contracts' :
                 activeView === 'negotiations-list' ? 'Active Negotiations' :
+                activeView === 'workflow-drafting' ? 'Drafting & Negotiation' :
+                activeView === 'workflow-approval' ? 'Approval & Signature' :
+                activeView === 'workflow-payment' ? 'Payment Preparation' :
                 activeView === 'create-contract' ? 'Create New Contract' :
                 activeView === 'drafting' ? 'Contract Drafting' :
                 activeView === 'negotiation' ? 'Negotiation & Versions' :
