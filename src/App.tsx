@@ -322,8 +322,8 @@ export default function App() {
           <div className="pt-4">
             <p className="px-4 py-2.5 text-sm font-bold text-slate-400 uppercase tracking-wider">Workflows</p>
             <NavItem icon={<FileEdit size={18} />} label="Drafting & Negotiation" active={activeView === 'workflow-drafting'} onClick={() => setActiveView('workflow-drafting')} />
-            <NavItem icon={<MessageSquare size={18} />} label="Approval & Signature" active={activeView === 'workflow-approval'} onClick={() => setActiveView('workflow-approval')} />
-            <NavItem icon={<CreditCard size={18} />} label="Payment Preparation" active={activeView === 'workflow-payment'} onClick={() => setActiveView('workflow-payment')} />
+            <NavItem icon={<MessageSquare size={18} />} label="Approval & Signature" active={activeView === 'workflow-approval' || activeView === 'approval-tracking'} onClick={() => setActiveView('workflow-approval')} />
+            <NavItem icon={<CreditCard size={18} />} label="Payment Preparation" active={activeView === 'workflow-payment' || activeView === 'payment-preparation'} onClick={() => setActiveView('workflow-payment')} />
           </div>
 
           <div className="pt-4 mt-4 border-t border-slate-100">
@@ -354,8 +354,8 @@ export default function App() {
                 activeView === 'drafts-list' ? 'Draft Contracts' :
                 activeView === 'negotiations-list' ? 'Active Negotiations' :
                 activeView === 'workflow-drafting' ? 'Drafting & Negotiation' :
-                activeView === 'workflow-approval' ? 'Approval & Signature' :
-                activeView === 'workflow-payment' ? 'Payment Preparation' :
+                activeView === 'workflow-approval' || activeView === 'approval-tracking' ? 'Approval & Signature' :
+                activeView === 'workflow-payment' || activeView === 'payment-preparation' ? 'Payment Preparation' :
                 activeView === 'create-contract' ? 'Create New Contract' :
                 activeView === 'drafting' ? 'Contract Drafting' :
                 activeView === 'negotiation' ? 'Negotiation & Versions' :

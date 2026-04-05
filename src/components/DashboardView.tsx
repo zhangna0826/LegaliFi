@@ -15,7 +15,7 @@ const STAGES: ContractStatus[] = [
 
 interface DashboardViewProps {
   contracts: Contract[];
-  onSelectContract: (c: Contract) => void;
+  onSelectContract: (id: string) => void;
   onNewContract: () => void;
   onNavigate?: (view: string) => void;
 }
@@ -232,7 +232,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                     "flex items-start gap-4 group transition-all",
                     isClickable ? "cursor-pointer hover:bg-slate-50/50 p-2 -m-2 rounded-xl" : "cursor-default"
                   )}
-                  onClick={() => isClickable && onSelectContract(contract)}
+                  onClick={() => isClickable && onSelectContract(contract.id)}
                 >
                   <div className="mt-1">
                     <div className={cn(

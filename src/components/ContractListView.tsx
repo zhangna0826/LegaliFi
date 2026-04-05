@@ -7,7 +7,7 @@ import { cn } from '../lib/utils';
 interface ContractListViewProps {
   contracts: Contract[];
   filterStatus?: ContractStatus | 'All';
-  onSelectContract: (c: Contract) => void;
+  onSelectContract: (id: string) => void;
   onNewContract: () => void;
   title: string;
 }
@@ -78,7 +78,7 @@ export const ContractListView: React.FC<ContractListViewProps> = ({
                 return (
                   <tr 
                     key={contract.id} 
-                    onClick={() => isClickable && onSelectContract(contract)}
+                    onClick={() => isClickable && onSelectContract(contract.id)}
                     className={cn(
                       "transition-colors group",
                       isClickable ? "hover:bg-slate-50/50 cursor-pointer" : "cursor-default"
