@@ -1077,7 +1077,7 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
                     >
                       {currentSectionIndex === 0 ? (
                         <div className="space-y-6">
-                          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                          <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-3">
                             <p className="text-[10px] font-bold text-slate-900 uppercase tracking-wider">Party A — Company</p>
                             <DetailField label="Effective Date" value={formData.effectiveDate} onChange={(v) => updateField('effectiveDate', v)} />
                             <DetailField label="Company Name" value={formData.partyA.companyName} onChange={(v) => updateField('partyA.companyName', v)} />
@@ -1086,7 +1086,7 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
                             <DetailField label="Contact Person" value={formData.partyA.contactPerson} onChange={(v) => updateField('partyA.contactPerson', v)} />
                             <DetailField label="Email" value={formData.partyA.email} onChange={(v) => updateField('partyA.email', v)} />
                           </div>
-                          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                          <div className="p-4 bg-white border border-slate-200 rounded-xl space-y-3">
                             <p className="text-[10px] font-bold text-slate-900 uppercase tracking-wider">Party B — Creator / Influencer</p>
                             <DetailField label="Legal Name" value={formData.partyB.legalName} onChange={(v) => updateField('partyB.legalName', v)} />
                             <DetailField label="Platform Handle(s)" value={formData.partyB.platformHandles} onChange={(v) => updateField('partyB.platformHandles', v)} />
