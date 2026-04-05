@@ -27,7 +27,7 @@ export const ContractListView: React.FC<ContractListViewProps> = ({
     const { id, status, riskLevel } = contract;
     
     // Drafting & Negotiation
-    if (id === '1') return { label: 'Drafting', icon: <FileText size={16} className="text-blue-500" /> };
+    if (id === 'new-influencer') return { label: 'Drafting', icon: <FileText size={16} className="text-blue-500" /> };
     if (id === '2') return { label: 'In Review', icon: <FileText size={16} className="text-teal-500" /> };
     if (id === '3') return { label: 'Negotiating', icon: <Zap size={16} className="text-orange-500" /> };
     
@@ -73,11 +73,16 @@ export const ContractListView: React.FC<ContractListViewProps> = ({
             <tbody className="divide-y divide-slate-100">
               {filteredContracts.map((contract) => {
                 const config = getStatusConfig(contract);
+                const isClickable = ['new-influencer', '4', '9'].includes(contract.id);
+                
                 return (
                   <tr 
                     key={contract.id} 
-                    onClick={() => onSelectContract(contract)}
-                    className="hover:bg-slate-50/50 cursor-pointer transition-colors group"
+                    onClick={() => isClickable && onSelectContract(contract)}
+                    className={cn(
+                      "transition-colors group",
+                      isClickable ? "hover:bg-slate-50/50 cursor-pointer" : "cursor-default"
+                    )}
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">

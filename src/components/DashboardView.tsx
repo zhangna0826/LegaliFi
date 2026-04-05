@@ -42,10 +42,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
   };
 
   // Use requested numbers for summary
-  const completedCount = 16;
-  const inApprovalCount = 6;
-  const waitingSignatureCount = 8; 
-  const overdueCount = 3;
+  const completedCount = 8;
+  const inApprovalCount = 5;
+  const draftingCount = 4;
+  const paymentCount = 2;
 
   return (
     <div className="space-y-4">
@@ -68,7 +68,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         <div onClick={() => setPipelineFilter('Drafting & Negotiation')}>
           <StatusCard 
             title="Drafting & Negotiation" 
-            value="3" 
+            value={draftingCount.toString()} 
             icon={<FileEdit size={18} className="text-indigo-600" />} 
             color="indigo"
             active={pipelineFilter === 'Drafting & Negotiation'}
@@ -77,7 +77,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         <div onClick={() => setPipelineFilter('Approval & Signature')}>
           <StatusCard 
             title="Approval & Signature" 
-            value="5" 
+            value={inApprovalCount.toString()} 
             icon={<PenTool size={18} className="text-amber-600" />} 
             color="amber"
             active={pipelineFilter === 'Approval & Signature'}
@@ -86,7 +86,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         <div onClick={() => setPipelineFilter('Payment Preparation')}>
           <StatusCard 
             title="Payment Preparation" 
-            value="2" 
+            value={paymentCount.toString()} 
             icon={<CreditCard size={18} className="text-blue-600" />} 
             color="blue"
             active={pipelineFilter === 'Payment Preparation'}
@@ -95,7 +95,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
         <div onClick={() => setPipelineFilter('Completed')}>
           <StatusCard 
             title="Completed" 
-            value="8" 
+            value={completedCount.toString()} 
             icon={<Flag size={18} className="text-emerald-600" />} 
             color="emerald"
             active={pipelineFilter === 'Completed'}
@@ -134,9 +134,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
               .filter(contract => {
                 if (pipelineFilter === 'All') return true;
                 if (pipelineFilter === 'Drafting & Negotiation') return contract.status === 'Drafting' || contract.status === 'Negotiation';
-                if (pipelineFilter === 'Approval & Signature') return contract.status === 'Internal Consultation' || contract.status === 'Legal Review' || contract.status === 'Finance Approval' || contract.status === 'Final Approval' || contract.id === '8';
+                if (pipelineFilter === 'Approval & Signature') return contract.status === 'Internal Consultation' || contract.status === 'Legal Review' || contract.status === 'Finance Approval' || contract.status === 'Final Approval' || contract.status === 'Approval Stuck' || contract.status === 'In Approval' || contract.status === 'Signing';
                 if (pipelineFilter === 'Payment Preparation') return contract.status === 'Payment Ready';
-                if (pipelineFilter === 'Completed') return contract.status === 'Signed' && contract.id !== '8';
+                if (pipelineFilter === 'Completed') return contract.status === 'Signed';
                 return true;
               })
               .map((contract) => {
@@ -223,8 +223,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
 
               const config = getStatusConfig(contract.status, contract.riskLevel || 'Low', contract.id);
               
+              const isClickable = ['new-influencer', '4', '9'].includes(contract.id);
+              
               return (
-                <div key={contract.id} className="flex items-start gap-4 group cursor-pointer" onClick={() => onSelectContract(contract)}>
+                <div 
+                  key={contract.id} 
+                  className={cn(
+                    "flex items-start gap-4 group transition-all",
+                    isClickable ? "cursor-pointer hover:bg-slate-50/50 p-2 -m-2 rounded-xl" : "cursor-default"
+                  )}
+                  onClick={() => isClickable && onSelectContract(contract)}
+                >
                   <div className="mt-1">
                     <div className={cn(
                       "w-10 h-10 rounded-xl flex items-center justify-center border transition-all",

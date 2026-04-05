@@ -3,17 +3,19 @@ import {
   ShieldAlert, FileText, Sparkles, Save, Send, 
   ChevronLeft, ChevronRight, ChevronDown, Download, Eye, 
   Bold, Italic, Underline, List, AlignLeft, 
-  AlignCenter, AlignRight, MessageSquare, 
+  AlignCenter, AlignRight, MessageSquare, MapPin,
   Info, Flag, Users, Bot, X, Check,
   MoreHorizontal, Trash2, Reply, Search,
   Minus, Plus, Type as TypeIcon, FileUp, FileDown,
-  Highlighter, ListOrdered, Quote, Bell, History
+  Highlighter, ListOrdered, Quote, Bell, History,
+  Clock, ArrowRight, ShieldCheck, AlertTriangle, ChevronUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { analyzeContractClause } from '../services/geminiService';
 import { Risk, Comment as ContractComment } from '../types';
+import { SuccessModal } from './SuccessModal';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -27,6 +29,7 @@ interface DraftingViewProps {
   onBack?: () => void;
   onNext?: () => void;
   onSendForApproval?: () => void;
+  onViewApprovalStatus?: () => void;
 }
 
 const SECTIONS = [
@@ -36,11 +39,15 @@ const SECTIONS = [
   { id: 'article-4', title: 'Article IV: Payment', fields: ['compensation.total', 'compensation.currency', 'compensation.structure', 'milestones', 'payment.method', 'payment.bank', 'payment.routing', 'payment.days', 'payment.interest'] },
   { id: 'article-5', title: 'Article V: IP', fields: ['ip.type', 'ip.duration'] },
   { id: 'article-6', title: 'Article VI: Exclusivity', fields: ['exclusivity.days', 'exclusivity.category', 'exclusivity.competitors'] },
-  { id: 'article-7', title: 'Article X: Governing Law', fields: ['governingLaw.jurisdiction'] }
+  { id: 'article-7', title: 'Article VII: Compliance', fields: [] },
+  { id: 'article-8', title: 'Article VIII: Confidentiality', fields: [] },
+  { id: 'article-9', title: 'Article IX: Termination', fields: [] },
+  { id: 'article-10', title: 'Article X: Governing Law', fields: ['governingLaw.jurisdiction'] }
 ];
 
-export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, initialTitle, onBack, onNext, onSendForApproval }) => {
+export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, initialTitle, onBack, onNext, onSendForApproval, onViewApprovalStatus }) => {
   const [activeTab, setActiveTab] = useState<SidebarTab>('details');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [formData, setFormData] = useState({
     title: initialTitle || "Influencer Cooperation Agreement",
@@ -233,36 +240,93 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
   const [risks, setRisks] = useState<Risk[]>([
     {
       id: 'r1',
-      category: 'Payment',
-      severity: 'Medium',
-      description: 'The payment term of 30 days is standard, but consider adding interest for late payments.',
-      suggestion: 'Add: "Late payments shall accrue interest at a rate of 1.5% per month."',
-      status: 'Pending'
+      category: 'No refund clause for non-delivery',
+      severity: 'High',
+      description: 'If the Creator receives the 30% signing payment but fails to deliver any content, ISU Tech has no contractual right to recover the payment.',
+      suggestion: 'Add clause requiring full refund if no deliverables are published within 30 days of agreed date.',
+      status: 'Pending',
+      article: 'Article IX — Termination'
     },
     {
       id: 'r2',
-      category: 'Termination',
-      severity: 'High',
-      description: '30 days notice for termination for convenience might be too short for critical services.',
-      suggestion: 'Increase notice period to 60 or 90 days for critical service orders.',
-      status: 'Pending'
+      category: 'Payment verification undefined',
+      severity: 'Medium',
+      description: 'The contract does not specify who verifies deliverables or the timeline for verification after publication.',
+      suggestion: 'Add 5-day verification window with auto-approval if Party A does not respond.',
+      status: 'Pending',
+      article: 'Article IV — Compensation'
     }
   ]);
 
+  const [highlightedRiskId, setHighlightedRiskId] = useState<string | null>(null);
+  const [pulsingRiskIconId, setPulsingRiskIconId] = useState<string | null>(null);
+  const [highlightedClauseId, setHighlightedClauseId] = useState<string | null>(null);
+  const [isFixing, setIsFixing] = useState<string | null>(null);
+
+  const [commentsFilter, setCommentsFilter] = useState<'All' | 'Internal'>('All');
+  const [newCommentVisibility, setNewCommentVisibility] = useState<'All' | 'Internal'>('All');
+  const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
+  const [highlightedArticleId, setHighlightedArticleId] = useState<string | null>(null);
+  const [pulsingBubbleId, setPulsingBubbleId] = useState<string | null>(null);
   const [comments, setComments] = useState<ContractComment[]>([
     {
       id: 'c1',
       author: 'Sarah J.',
-      text: 'Is the contract value inclusive of taxes?',
-      timestamp: '2024-03-13T10:30:00Z',
+      role: 'Legal Reviewer',
+      text: 'Which entity should we use for this contract? If the creator is US-based, ISU Tech Ltd. is preferred for tax purposes.',
+      timestamp: '09:15',
+      article: 'Article I — Parties',
+      isInternal: true,
+      isResolved: true,
+      resolvedBy: 'Na Zhang',
       replies: [
         {
-          id: 'c2',
+          id: 'c1-r1',
           author: 'Na Zhang',
-          text: 'I will check with the finance team.',
-          timestamp: '2024-03-13T10:45:00Z'
+          role: 'Marketing Specialist',
+          text: "Creator is based in Iowa, so I'll go with ISU Tech Ltd.",
+          timestamp: '09:22'
         }
       ]
+    },
+    {
+      id: 'c2',
+      author: 'Sarah J.',
+      role: 'Legal Reviewer',
+      text: 'Is the contract value inclusive of taxes? We need to clarify this before sending to the creator.',
+      timestamp: '10:30',
+      article: 'Article IV — Compensation',
+      isInternal: false,
+      isResolved: false,
+      replies: [
+        {
+          id: 'c2-r1',
+          author: 'Na Zhang',
+          role: 'Marketing Specialist',
+          text: 'I will check with the finance team.',
+          timestamp: '10:45'
+        }
+      ]
+    },
+    {
+      id: 'c3',
+      author: 'Michael H.',
+      role: 'Finance',
+      text: '12-month license duration seems short for a $12,500 contract. Should we negotiate for 18 months?',
+      timestamp: '11:00',
+      article: 'Article V — Intellectual Property',
+      isInternal: true,
+      isResolved: false
+    },
+    {
+      id: 'c4',
+      author: 'Alex Rivera',
+      role: 'Creator / Influencer',
+      text: 'Can I use my own creative direction for the TikTok post, or do you need me to follow a specific script?',
+      timestamp: 'Yesterday',
+      article: 'Article II — Deliverables',
+      isInternal: false,
+      isResolved: false
     }
   ]);
 
@@ -275,21 +339,131 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
 
   const handleAIReview = async () => {
     setIsAnalyzing(true);
-    // In a real app, we'd send the whole content or specific parts
-    const result = await analyzeContractClause("Influencer Cooperation Agreement content");
-    if (result) {
-      const newRisk: Risk = {
-        id: Math.random().toString(36).substr(2, 9),
-        category: 'AI Identified',
-        severity: result.riskLevel as any,
-        description: result.summary,
-        suggestion: result.suggestions[0] || 'Review this clause carefully.',
-        status: 'Pending'
-      };
-      setRisks([newRisk, ...risks]);
-      setActiveTab('risks');
-    }
+    // Simulate a scan
+    await new Promise(resolve => setTimeout(resolve, 1500));
     setIsAnalyzing(false);
+    setActiveTab('risks');
+    setRiskFilter('Pending');
+  };
+
+  const handleCommentBubbleClick = (commentId: string) => {
+    setActiveTab('comments');
+    setHighlightedCommentId(commentId);
+    setTimeout(() => {
+      const element = document.getElementById(`comment-${commentId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    setTimeout(() => setHighlightedCommentId(null), 2000);
+  };
+
+  const handleCommentClick = (articleTitle?: string) => {
+    if (!articleTitle) return;
+    
+    // Map comment article titles to section IDs
+    const mapping: Record<string, string> = {
+      'Article I — Parties': 'article-1',
+      'Article II — Deliverables': 'article-2',
+      'Article IV — Compensation': 'article-4',
+      'Article V — Intellectual Property': 'article-5'
+    };
+    
+    const sectionId = mapping[articleTitle];
+    if (sectionId) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Trigger animations
+        setHighlightedArticleId(sectionId);
+        setPulsingBubbleId(sectionId);
+        
+        setTimeout(() => {
+          setHighlightedArticleId(null);
+          setPulsingBubbleId(null);
+        }, 2000);
+      }
+    }
+  };
+
+  const handleResolveComment = (id: string) => {
+    setComments(prev => prev.map(c => 
+      c.id === id ? { ...c, isResolved: true, resolvedBy: 'Na Zhang' } : c
+    ));
+  };
+
+  const handleReopenComment = (id: string) => {
+    setComments(prev => prev.map(c => 
+      c.id === id ? { ...c, isResolved: false, resolvedBy: undefined } : c
+    ));
+  };
+
+  const handleAddComment = (text: string) => {
+    if (!text.trim()) return;
+    const newComment: ContractComment = {
+      id: `c${Date.now()}`,
+      author: 'Na Zhang',
+      role: 'Marketing Specialist',
+      text,
+      timestamp: 'Just now',
+      isInternal: newCommentVisibility === 'Internal',
+      isResolved: false
+    };
+    setComments([...comments, newComment]);
+  };
+
+  const filteredComments = comments.filter(c => {
+    if (commentsFilter === 'Internal') return c.isInternal;
+    return true;
+  });
+
+  const handleRiskIconClick = (riskId: string) => {
+    setActiveTab('risks');
+    setHighlightedRiskId(riskId);
+    setTimeout(() => {
+      const element = document.getElementById(`risk-${riskId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    setTimeout(() => setHighlightedRiskId(null), 2000);
+  };
+
+  const handleRiskAnchorClick = (articleTitle?: string, riskId?: string) => {
+    if (!articleTitle) return;
+    
+    const section = SECTIONS.find(s => s.title.includes(articleTitle.split(' — ')[0] || ''));
+    if (section) {
+      const element = document.getElementById(section.id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        setPulsingRiskIconId(section.id);
+        setHighlightedClauseId(section.id);
+        
+        setTimeout(() => {
+          setPulsingRiskIconId(null);
+          setHighlightedClauseId(null);
+        }, 3000);
+      }
+    }
+  };
+
+  const handleApplyFix = (riskId: string) => {
+    setIsFixing(riskId);
+    setTimeout(() => {
+      setRisks(prev => prev.map(r => 
+        r.id === riskId ? { ...r, status: 'Fixed' } : r
+      ));
+      setIsFixing(null);
+    }, 500);
+  };
+
+  const handleIgnoreRisk = (riskId: string) => {
+    setRisks(prev => prev.map(r => 
+      r.id === riskId ? { ...r, status: 'Ignored' } : r
+    ));
   };
 
   const filteredRisks = risks.filter(r => {
@@ -298,7 +472,23 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
   });
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden">
+    <div className="flex flex-col h-full bg-white overflow-hidden relative">
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Contract Submitted"
+        message='"Influencer Cooperation Agreement" has been sent for approval.'
+        subMessage="Approval routing: Manager → Legal → Finance → CEO"
+        primaryActionLabel="View Approval Status"
+        onPrimaryAction={() => {
+          setShowSuccessModal(false);
+          onViewApprovalStatus?.();
+        }}
+        details={[
+          { label: 'Contract Type', value: 'Influencer Agreement' },
+          { label: 'Total Amount', value: '$12,500' }
+        ]}
+      />
       {/* Top Header */}
       <div className="h-14 border-b border-slate-200 flex items-center justify-between px-6 shrink-0 bg-white z-30">
         <div className="flex items-center gap-4">
@@ -405,19 +595,23 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
               {/* Document Title */}
               <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold tracking-tight uppercase">Influencer Cooperation Agreement</h1>
-                <div className="h-px bg-slate-900 w-full mt-6" />
               </div>
+
+              <div className="h-px bg-slate-900 w-full mb-8" />
 
               {/* ARTICLE I */}
               <section 
                 id="article-1"
                 className={cn(
                   "mb-10 p-4 -m-4 rounded-xl transition-all cursor-pointer",
-                  currentSectionIndex === 0 ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50"
+                  currentSectionIndex === 0 || highlightedArticleId === 'article-1' ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50"
                 )}
                 onClick={() => { setCurrentSectionIndex(0); setActiveTab('details'); }}
               >
-                <h2 className="text-lg font-bold mb-4">ARTICLE I — PARTIES</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold">ARTICLE I — PARTIES</h2>
+                  <CommentBubble count={1} onClick={() => handleCommentBubbleClick('c1')} isPulsing={pulsingBubbleId === 'article-1'} />
+                </div>
                 <LockedSection className="mb-6">
                   This Influencer Cooperation Agreement (the "Agreement") is entered into as of <FillableField value={formData.effectiveDate} onChange={(v) => updateField('effectiveDate', v)} placeholder="[Effective Date]" width="140px" /> by and between:
                 </LockedSection>
@@ -554,11 +748,14 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
                 id="article-2"
                 className={cn(
                   "mb-10 p-4 -m-4 rounded-xl transition-all cursor-pointer",
-                  currentSectionIndex === 1 ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50"
+                  currentSectionIndex === 1 || highlightedArticleId === 'article-2' ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50"
                 )}
                 onClick={() => { setCurrentSectionIndex(1); setActiveTab('details'); }}
               >
-                <h2 className="text-lg font-bold mb-4">ARTICLE II — DELIVERABLES</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold">ARTICLE II — DELIVERABLES</h2>
+                  <CommentBubble count={1} onClick={() => handleCommentBubbleClick('c4')} isPulsing={pulsingBubbleId === 'article-2'} />
+                </div>
                 <LockedSection className="mb-4">
                   Party B agrees to create and publish the following content deliverables on the designated platforms:
                 </LockedSection>
@@ -620,11 +817,23 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
                 id="article-4"
                 className={cn(
                   "mb-10 p-4 -m-4 rounded-xl transition-all cursor-pointer",
-                  currentSectionIndex === 3 ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50"
+                  currentSectionIndex === 3 || highlightedArticleId === 'article-4' ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50",
+                  highlightedClauseId === 'article-4' && "bg-orange-50 ring-2 ring-orange-200"
                 )}
                 onClick={() => { setCurrentSectionIndex(3); setActiveTab('details'); }}
               >
-                <h2 className="text-lg font-bold mb-4">ARTICLE IV — COMPENSATION & PAYMENT</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold">ARTICLE IV — COMPENSATION & PAYMENT</h2>
+                  <div className="flex items-center gap-2">
+                    <AIRiskIcon 
+                      severity="Medium" 
+                      status={risks.find(r => r.id === 'r2')?.status || 'Pending'} 
+                      onClick={() => handleRiskIconClick('r2')} 
+                      isPulsing={pulsingRiskIconId === 'article-4'}
+                    />
+                    <CommentBubble count={1} onClick={() => handleCommentBubbleClick('c2')} isPulsing={pulsingBubbleId === 'article-4'} />
+                  </div>
+                </div>
                 <table className="w-full border-collapse text-sm mb-6">
                   <tbody>
                     <tr className="border border-slate-200">
@@ -680,7 +889,7 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
                   </tbody>
                 </table>
 
-                <LockedSection>
+                <LockedSection className="relative">
                   Payment shall be processed within <FillableField value={formData.payment.days} onChange={(v) => updateField('payment.days', v)} placeholder="[15]" width="30px" /> business days of milestone completion and invoice receipt. Late payments accrue interest at <FillableField value={formData.payment.interest} onChange={(v) => updateField('payment.interest', v)} placeholder="[1.5]" width="40px" />% per month. Party B is responsible for all applicable taxes. Party A may withhold taxes as required by law and will provide IRS Form 1099 where applicable.
                 </LockedSection>
               </section>
@@ -690,11 +899,14 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
                 id="article-5"
                 className={cn(
                   "mb-10 p-4 -m-4 rounded-xl transition-all cursor-pointer",
-                  currentSectionIndex === 4 ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50"
+                  currentSectionIndex === 4 || highlightedArticleId === 'article-5' ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50"
                 )}
                 onClick={() => { setCurrentSectionIndex(4); setActiveTab('details'); }}
               >
-                <h2 className="text-lg font-bold mb-4">ARTICLE V — INTELLECTUAL PROPERTY</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold">ARTICLE V — INTELLECTUAL PROPERTY</h2>
+                  <CommentBubble count={1} onClick={() => handleCommentBubbleClick('c3')} isPulsing={pulsingBubbleId === 'article-5'} />
+                </div>
                 <LockedSection>
                   Party A is granted a <FillableField value={formData.ip.type} onChange={(v) => updateField('ip.type', v)} placeholder="[non-exclusive]" width="120px" /> license to use, reproduce, and distribute the Deliverables for <FillableField value={formData.ip.duration} onChange={(v) => updateField('ip.duration', v)} placeholder="[12 months]" width="100px" /> across Party A's owned and paid channels (social media, website, email, paid advertising). Party B retains ownership of original content and may use Deliverables in their personal portfolio. Any use beyond the scope defined herein requires Party B's prior written consent and may be subject to additional fees.
                 </LockedSection>
@@ -733,9 +945,25 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
                 </LockedSection>
               </section>
 
-              <section className="mb-10">
-                <h2 className="text-lg font-bold mb-4">ARTICLE IX — TERMINATION</h2>
-                <LockedSection>
+              <section 
+                id="article-9"
+                className={cn(
+                  "mb-10 p-4 -m-4 rounded-xl transition-all cursor-pointer",
+                  currentSectionIndex === 8 || highlightedArticleId === 'article-9' ? "border-2 border-dashed border-indigo-500 bg-indigo-50/10" : "hover:bg-slate-50/50",
+                  highlightedClauseId === 'article-9' && "bg-red-50 ring-2 ring-red-200"
+                )}
+                onClick={() => { setCurrentSectionIndex(8); setActiveTab('details'); }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold">ARTICLE IX — TERMINATION</h2>
+                  <AIRiskIcon 
+                    severity="High" 
+                    status={risks.find(r => r.id === 'r1')?.status || 'Pending'} 
+                    onClick={() => handleRiskIconClick('r1')} 
+                    isPulsing={pulsingRiskIconId === 'article-9'}
+                  />
+                </div>
+                <LockedSection className="relative">
                   Either party may terminate this Agreement with 14 days' written notice if the other party materially breaches any provision and fails to cure within 10 days of receiving notice. Upon termination, Party A shall compensate Party B for all completed and accepted Deliverables. Articles V, VIII, and X survive termination.
                 </LockedSection>
               </section>
@@ -799,9 +1027,9 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
             icon={<Bot size={20} />} 
             active={activeTab === 'risks'} 
             onClick={() => setActiveTab('risks')} 
-            isAi
             badge={risks.filter(r => r.status === 'Pending').length}
-            color="text-red-500"
+            isAi={risks.filter(r => r.status === 'Pending').length > 0}
+            color={risks.filter(r => r.status === 'Pending').length > 0 ? "text-red-500" : "text-slate-400"}
           />
         </div>
 
@@ -978,7 +1206,10 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
                     
                     <div className="mt-auto pt-6">
                       <button 
-                        onClick={onSendForApproval}
+                        onClick={() => {
+                          setShowSuccessModal(true);
+                          onSendForApproval();
+                        }}
                         className="w-full py-3 bg-indigo-900 text-white rounded-xl font-bold shadow-xl shadow-indigo-900/20 hover:bg-indigo-950 transition-all flex items-center justify-center gap-2 group"
                       >
                         <span>Send for Approval</span>
@@ -991,64 +1222,173 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
             )}
 
             {activeTab === 'comments' && (
-              <div className="p-6 flex flex-col h-full">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="font-bold text-slate-800">Discussion (2)</h3>
-                  <button className="text-slate-400 hover:text-slate-600">
-                    <MoreHorizontal size={18} />
-                  </button>
+              <div className="flex flex-col h-full overflow-hidden">
+                <div className="p-6 pb-2">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-slate-800">Comments ({comments.length})</h3>
+                    <button className="text-slate-400 hover:text-slate-600">
+                      <MoreHorizontal size={18} />
+                    </button>
+                  </div>
+
+                  {/* Internal/External Toggle */}
+                  <div className="flex bg-slate-100 p-1 rounded-xl mb-4">
+                    <button 
+                      onClick={() => setCommentsFilter('All')}
+                      className={cn(
+                        "flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all",
+                        commentsFilter === 'All' ? "bg-indigo-900 text-white shadow-sm" : "text-slate-500 hover:text-slate-700"
+                      )}
+                    >
+                      All Parties
+                    </button>
+                    <button 
+                      onClick={() => setCommentsFilter('Internal')}
+                      className={cn(
+                        "flex-1 py-1.5 text-[10px] font-bold rounded-lg transition-all",
+                        commentsFilter === 'Internal' ? "bg-indigo-900 text-white shadow-sm" : "text-slate-500 hover:text-slate-700"
+                      )}
+                    >
+                      Internal Only
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-4 overflow-y-auto pr-2">
-                  {comments.map((comment) => (
-                    <div key={comment.id} className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-slate-800">{comment.author}</span>
-                        <span className="text-[10px] text-slate-400">10:30</span>
-                      </div>
-                      <p className="text-xs text-slate-600 leading-relaxed">{comment.text}</p>
-                      
-                      {/* Replies */}
-                      {comment.replies && comment.replies.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-slate-200 space-y-4">
-                          {comment.replies.map((reply) => (
-                            <div key={reply.id} className="pl-4 border-l-2 border-indigo-200">
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="text-xs font-bold text-slate-800">{reply.author}</span>
-                                <span className="text-[10px] text-slate-400">10:45</span>
-                              </div>
-                              <p className="text-xs text-slate-600 leading-relaxed">{reply.text}</p>
-                              <div className="mt-2 flex items-center gap-3">
-                                <button className="text-[10px] font-bold text-indigo-600 flex items-center gap-1">
-                                  <Reply size={12} /> Reply
-                                </button>
-                                <button className="text-[10px] font-bold text-slate-400">Resolve</button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                <div className="flex-1 overflow-y-auto px-6 space-y-4 custom-scrollbar pb-6">
+                  {filteredComments.map((comment) => (
+                    <div 
+                      key={comment.id} 
+                      id={`comment-${comment.id}`}
+                      onClick={() => handleCommentClick(comment.article)}
+                      className={cn(
+                        "p-4 rounded-xl border transition-all duration-500 cursor-pointer hover:border-indigo-200 group/comment",
+                        comment.isInternal ? "bg-blue-50/30 border-blue-100 border-l-4 border-l-blue-400" : "bg-white border-slate-100",
+                        highlightedCommentId === comment.id && "ring-2 ring-indigo-500 shadow-lg scale-[1.02] bg-indigo-50/50",
+                        comment.isResolved && "opacity-60 grayscale-[0.5]"
+                      )}
+                    >
+                      {/* Location Anchor */}
+                      {comment.article && (
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCommentClick(comment.article);
+                          }}
+                          className="flex items-center gap-1.5 text-[9px] font-bold text-indigo-600 mb-3 hover:underline transition-colors uppercase tracking-wider"
+                        >
+                          <MapPin size={10} />
+                          {comment.article}
+                        </button>
                       )}
 
-                      {!comment.replies || comment.replies.length === 0 ? (
-                        <div className="mt-3 flex items-center gap-3">
-                          <button className="text-[10px] font-bold text-indigo-600 flex items-center gap-1">
-                            <Reply size={12} /> Reply
-                          </button>
-                          <button className="text-[10px] font-bold text-slate-400">Resolve</button>
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className={cn(
+                            "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white",
+                            comment.author === 'Sarah J.' && "bg-purple-500",
+                            comment.author === 'Na Zhang' && "bg-indigo-600",
+                            comment.author === 'Michael H.' && "bg-emerald-500",
+                            comment.author === 'Alex Rivera' && "bg-orange-500"
+                          )}>
+                            {comment.author.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-slate-800">{comment.author}</span>
+                              {comment.isInternal && (
+                                <span className="px-1.5 py-0.5 bg-blue-100 text-blue-600 text-[8px] font-bold rounded uppercase tracking-tighter">Internal</span>
+                              )}
+                            </div>
+                            <p className="text-[9px] text-slate-400 font-medium">{comment.role}</p>
+                          </div>
                         </div>
-                      ) : null}
+                        <span className="text-[10px] text-slate-400">{comment.timestamp}</span>
+                      </div>
+
+                      {comment.isResolved ? (
+                        <div className="space-y-1">
+                          <p className="text-xs text-slate-500 italic line-clamp-1">{comment.text}</p>
+                          <div className="flex items-center justify-between">
+                            <p className="text-[10px] font-bold text-emerald-600 flex items-center gap-1">
+                              <Check size={12} /> Resolved by {comment.resolvedBy}
+                            </p>
+                            <button 
+                              onClick={() => handleReopenComment(comment.id)}
+                              className="text-[10px] font-bold text-indigo-600 hover:underline"
+                            >
+                              Reopen
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="text-xs text-slate-600 leading-relaxed mb-3">{comment.text}</p>
+                          
+                          {/* Replies */}
+                          {comment.replies && comment.replies.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-slate-100 space-y-3">
+                              {comment.replies.map((reply) => (
+                                <div key={reply.id} className="pl-3 border-l-2 border-slate-200">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="text-[10px] font-bold text-slate-800">{reply.author}</span>
+                                    <span className="text-[9px] text-slate-400">{reply.timestamp}</span>
+                                  </div>
+                                  <p className="text-[11px] text-slate-600 leading-relaxed">{reply.text}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          <div className="mt-3 flex items-center gap-3">
+                            <button className="text-[10px] font-bold text-indigo-600 flex items-center gap-1 hover:text-indigo-800">
+                              <Reply size={12} /> Reply
+                            </button>
+                            <button 
+                              onClick={() => handleResolveComment(comment.id)}
+                              className="text-[10px] font-bold text-slate-400 hover:text-emerald-600 flex items-center gap-1"
+                            >
+                              <Check size={12} /> Resolve
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-auto pt-4">
+                <div className="p-6 pt-2 border-t border-slate-100 bg-white">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Visible to:</span>
+                      <button 
+                        onClick={() => setNewCommentVisibility(prev => prev === 'All' ? 'Internal' : 'All')}
+                        className="flex items-center gap-1 px-2 py-0.5 bg-slate-50 border border-slate-200 rounded text-[10px] font-bold text-indigo-600 hover:bg-slate-100"
+                      >
+                        {newCommentVisibility === 'All' ? 'All Parties' : 'Internal Only'}
+                        <ChevronDown size={10} />
+                      </button>
+                    </div>
+                  </div>
                   <div className="relative">
                     <input 
                       type="text" 
                       placeholder="Add a comment..." 
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAddComment(e.currentTarget.value);
+                          e.currentTarget.value = '';
+                        }
+                      }}
                       className="w-full p-3 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-indigo-600 outline-none"
                     />
-                    <button className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-600">
+                    <button 
+                      onClick={(e) => {
+                        const input = e.currentTarget.previousSibling as HTMLInputElement;
+                        handleAddComment(input.value);
+                        input.value = '';
+                      }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-indigo-600 hover:text-indigo-800"
+                    >
                       <Send size={16} />
                     </button>
                   </div>
@@ -1095,66 +1435,126 @@ export const DraftingView: React.FC<DraftingViewProps> = ({ initialContent, init
             )}
 
             {activeTab === 'risks' && (
-              <div className="p-6 flex flex-col h-full">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-slate-800">AI Risk Review</h3>
-                  <button 
-                    onClick={handleAIReview}
-                    disabled={isAnalyzing}
-                    className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50"
-                  >
-                    <Bot size={18} />
-                  </button>
+              <div className="flex flex-col h-full">
+                <div className="p-4 border-b border-slate-200">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-bold text-slate-800 uppercase tracking-wider text-sm">AI Assistant</h3>
+                  </div>
                 </div>
 
-                <div className="flex gap-2 mb-6">
-                  <RiskFilterTab label="To Confirm" count={filteredRisks.length} active={riskFilter === 'Pending'} onClick={() => setRiskFilter('Pending')} />
-                  <RiskFilterTab label="Ignored" count={0} active={riskFilter === 'Ignored'} onClick={() => setRiskFilter('Ignored')} />
-                  <RiskFilterTab label="All" count={risks.length} active={riskFilter === 'All'} onClick={() => setRiskFilter('All')} />
-                </div>
-
-                <div className="space-y-4 overflow-y-auto pr-2 flex-1">
-                  {isAnalyzing ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <div className="w-12 h-12 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-4" />
-                      <p className="text-xs text-slate-500 font-medium">AI is scanning for risks...</p>
-                    </div>
-                  ) : filteredRisks.length > 0 ? (
-                    filteredRisks.map((risk) => (
-                      <div key={risk.id} className="p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow relative group">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{risk.category}</span>
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            risk.severity === 'High' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
-                          }`}>
-                            {risk.severity} Risk
-                          </span>
-                        </div>
-                        <p className="text-xs text-slate-700 font-medium mb-2 leading-relaxed">{risk.description}</p>
-                        <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-3">
-                          <p className="text-[10px] text-indigo-700 italic leading-relaxed">
-                            Suggestion: {risk.suggestion}
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <button className="flex-1 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-bold hover:bg-indigo-900 transition-colors">
-                            Apply Fix
-                          </button>
-                          <button className="px-3 py-1.5 border border-slate-200 text-slate-500 rounded-lg text-[10px] font-bold hover:bg-slate-50">
-                            Ignore
-                          </button>
-                        </div>
-                        <button className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-100 rounded transition-all">
-                          <MoreHorizontal size={14} className="text-slate-400" />
-                        </button>
+                <div className="flex-1 overflow-y-auto custom-scrollbar">
+                  {/* CONTRACT SUMMARY */}
+                  <div className="p-4 border-b border-slate-100">
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mb-3">Contract Summary</h4>
+                    <div className="space-y-3">
+                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                        A 3-month influencer cooperation agreement between ISU Tech Ltd. and a creator for social media content across Instagram, YouTube, and TikTok.
+                      </p>
+                      <div className="space-y-1">
+                        <p className="text-[11px] font-bold text-slate-700">Key terms:</p>
+                        <ul className="space-y-1">
+                          <li className="text-[10px] text-slate-600 flex items-start gap-2">
+                            <span className="mt-1 w-1 h-1 rounded-full bg-slate-300 shrink-0" />
+                            <span>Payment: milestone-based, 30% on signing + 70% on completion</span>
+                          </li>
+                          <li className="text-[10px] text-slate-600 flex items-start gap-2">
+                            <span className="mt-1 w-1 h-1 rounded-full bg-slate-300 shrink-0" />
+                            <span>IP License: non-exclusive, 12 months</span>
+                          </li>
+                          <li className="text-[10px] text-slate-600 flex items-start gap-2">
+                            <span className="mt-1 w-1 h-1 rounded-full bg-slate-300 shrink-0" />
+                            <span>Non-compete: 30 days post-publication</span>
+                          </li>
+                          <li className="text-[10px] text-slate-600 flex items-start gap-2">
+                            <span className="mt-1 w-1 h-1 rounded-full bg-slate-300 shrink-0" />
+                            <span>Content must comply with FTC Guidelines (16 CFR Part 255)</span>
+                          </li>
+                          <li className="text-[10px] text-slate-600 flex items-start gap-2">
+                            <span className="mt-1 w-1 h-1 rounded-full bg-slate-300 shrink-0" />
+                            <span>Late payment interest: 1.5%/month</span>
+                          </li>
+                        </ul>
                       </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12 text-center opacity-50">
-                      <ShieldAlert size={48} className="text-slate-300 mb-4" />
-                      <p className="text-xs text-slate-500">No risks found in this view.</p>
                     </div>
-                  )}
+                  </div>
+
+                  {/* RISK ALERTS */}
+                  <div className="p-4">
+                    <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.1em] mb-4">
+                      Risk Alerts ({risks.filter(r => r.status === 'Pending').length})
+                    </h4>
+                    
+                    <div className="space-y-3">
+                      {risks.map((risk) => (
+                        <motion.div
+                          key={risk.id}
+                          layout
+                          onClick={() => handleRiskAnchorClick(risk.article, risk.id)}
+                          className={cn(
+                            "rounded-xl border transition-all overflow-hidden cursor-pointer",
+                            risk.status === 'Fixed' ? "bg-emerald-50/30 border-emerald-100" :
+                            risk.status === 'Ignored' ? "bg-slate-50 border-slate-200" :
+                            "bg-white border-slate-200"
+                          )}
+                        >
+                          {risk.status === 'Pending' ? (
+                            <div className="p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                                  <span className="text-[10px] font-bold text-slate-800 uppercase">{risk.article}</span>
+                                </div>
+                                <span className={cn(
+                                  "text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider",
+                                  risk.severity === 'High' ? "bg-red-100 text-red-700" : "bg-orange-100 text-orange-700"
+                                )}>
+                                  {risk.severity} Risk
+                                </span>
+                              </div>
+                              
+                              <h5 className="text-[11px] font-bold text-slate-800 mb-1">{risk.category}</h5>
+                              <p className="text-[10px] text-slate-600 leading-relaxed mb-3">{risk.description}</p>
+                              
+                              <div className="flex items-start gap-1.5 mb-3">
+                                <span className="text-xs">💡</span>
+                                <p className="text-[10px] text-slate-700 font-medium leading-relaxed italic">{risk.suggestion}</p>
+                              </div>
+
+                              <div className="flex gap-2">
+                                <button 
+                                  onClick={() => handleApplyFix(risk.id)}
+                                  disabled={isFixing === risk.id}
+                                  className="flex-1 py-1.5 bg-indigo-600 text-white text-[10px] font-bold rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-1.5"
+                                >
+                                  {isFixing === risk.id ? <Check size={12} className="animate-pulse" /> : <Check size={12} />}
+                                  Apply Fix
+                                </button>
+                                <button 
+                                  onClick={() => handleIgnoreRisk(risk.id)}
+                                  className="px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-[10px] font-bold rounded-lg hover:bg-slate-50 transition-colors"
+                                >
+                                  Ignore
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="px-3 py-2 flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-slate-400">{risk.status === 'Fixed' ? '✓' : '○'}</span>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">{risk.article}</span>
+                              </div>
+                              <span className={cn(
+                                "text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider",
+                                risk.status === 'Fixed' ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
+                              )}>
+                                {risk.status === 'Fixed' ? 'Fixed' : 'Ignored'}
+                              </span>
+                            </div>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -1297,7 +1697,7 @@ function SidebarIconButton({ icon, active, onClick, isAi, badge, color }: { icon
       <div className={cn("transition-colors", !active && color)}>
         {icon}
       </div>
-      {badge && badge > 0 && (
+      {badge > 0 && (
         <div className={cn(
           "absolute -top-1 -right-1 w-4 h-4 text-white text-[8px] font-bold rounded-full flex items-center justify-center border-2 border-white",
           isAi ? "bg-red-600" : "bg-indigo-600"
@@ -1406,6 +1806,51 @@ function FillableField({ value, onChange, placeholder, width, className }: {
         )}
       />
     </div>
+  );
+}
+
+function AIRiskIcon({ severity, status, onClick, isPulsing }: { severity: 'High' | 'Medium' | 'Low', status: 'Pending' | 'Ignored' | 'Fixed', onClick: () => void, isPulsing?: boolean }) {
+  const color = severity === 'High' ? 'bg-red-500' : severity === 'Medium' ? 'bg-orange-500' : 'bg-blue-500';
+  const dotColor = status === 'Fixed' ? 'bg-emerald-500' : status === 'Ignored' ? 'bg-slate-400' : color;
+  
+  return (
+    <button 
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      className={cn(
+        "flex items-center gap-1 px-2 py-1 bg-slate-50 rounded-full border border-slate-200 hover:bg-slate-100 transition-all shadow-sm group relative",
+        isPulsing && "animate-pulse ring-4 ring-indigo-500/30 scale-110"
+      )}
+    >
+      <Bot size={12} className="text-slate-600" />
+      <div className={cn("w-2 h-2 rounded-full", dotColor)} />
+      {isPulsing && (
+        <span className="absolute inset-0 rounded-full bg-indigo-400/20 animate-ping" />
+      )}
+    </button>
+  );
+}
+
+function CommentBubble({ count, onClick, isPulsing }: { count: number, onClick: () => void, isPulsing?: boolean }) {
+  return (
+    <button 
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      className={cn(
+        "flex items-center gap-1 px-2 py-1 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100 hover:bg-indigo-100 transition-all shadow-sm group relative",
+        isPulsing && "animate-pulse ring-4 ring-indigo-500/30 scale-110 bg-indigo-100"
+      )}
+    >
+      <MessageSquare size={12} className={cn("group-hover:scale-110 transition-transform", isPulsing && "scale-110")} />
+      <span className="text-[10px] font-bold">{count}</span>
+      {isPulsing && (
+        <span className="absolute inset-0 rounded-full bg-indigo-400/20 animate-ping" />
+      )}
+    </button>
   );
 }
 

@@ -36,6 +36,8 @@ import { PaymentView } from './components/PaymentView';
 import { CreateContractView } from './components/CreateContractView';
 import { AdminView } from './components/AdminView';
 import { ContractListView } from './components/ContractListView';
+import { ApprovalTrackingView } from './components/ApprovalTrackingView';
+import { PaymentPreparationView } from './components/PaymentPreparationView';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -44,20 +46,32 @@ function cn(...inputs: ClassValue[]) {
 // Comprehensive Mock Data - Adjusted to match requested numbers:
 // 1 completed, 2 in approval, 3 waiting for signature, 1 overdue/stuck
 const MOCK_CONTRACTS: Contract[] = [
+  // Scenario 1: Drafting (New)
+  { id: 'new-influencer', title: 'Influencer Cooperation Agreement', partner: 'Alex Rivera', amount: 12500, status: 'Drafting', updatedAt: '2026-03-27T10:23:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  
   // Drafting & Negotiation (3 items)
   { id: '1', title: 'Contract A', partner: 'Company A', amount: 12500, status: 'Drafting', updatedAt: '2026-03-24T17:37:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   { id: '2', title: 'Contract B', partner: 'Company B', amount: 4800, status: 'Drafting', updatedAt: '2026-03-25T14:15:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   { id: '3', title: 'Contract C', partner: 'Company C', amount: 25000, status: 'Negotiation', updatedAt: '2026-03-26T18:48:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   
-  // Approval & Signature (5 items)
-  { id: '4', title: 'Contract D', partner: 'Company D', amount: 8000, status: 'Legal Review', updatedAt: '2026-03-25T15:22:00Z', owner: 'Erin Z.', riskLevel: 'High', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Legal', name: 'James W.', status: 'Pending', estimatedDays: 5 }] },
-  { id: '5', title: 'Contract E', partner: 'Company E', amount: 15000, status: 'Finance Approval', updatedAt: '2026-03-26T21:45:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Finance', name: 'Lisa M.', status: 'Pending', estimatedDays: 2 }] },
-  { id: '6', title: 'Contract F', partner: 'Company F', amount: 32000, status: 'Final Approval', updatedAt: '2026-03-24T16:10:00Z', owner: 'Erin Z.', riskLevel: 'High', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'CEO', name: 'James W.', status: 'Pending', estimatedDays: 3 }] },
-  { id: '7', title: 'Contract G', partner: 'Company G', amount: 50000, status: 'Internal Consultation', updatedAt: '2026-03-26T13:30:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Strategy', name: 'Rachel K.', status: 'Pending', estimatedDays: 4 }] },
-  { id: '8', title: 'Contract H', partner: 'Company H', amount: 18000, status: 'Signed', updatedAt: '2026-03-26T22:05:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  // Scenario 2: Approval & Signature (Contract D)
+  { id: '4', title: 'Contract D', partner: 'Company D', amount: 8000, status: 'Approval Stuck', updatedAt: '2026-03-25T15:22:00Z', owner: 'Na Zhang', riskLevel: 'High', versions: [], comments: [], deliverables: [], approvalPath: [
+    { role: 'Applicant', name: 'Na Zhang', status: 'Approved', estimatedDays: 0 },
+    { role: 'Manager', name: 'David L.', status: 'Approved', estimatedDays: 1 },
+    { role: 'Legal', name: 'James W.', status: 'Pending', estimatedDays: 5 },
+    { role: 'Finance', name: 'Michael H.', status: 'Pending', estimatedDays: 2 }
+  ] },
   
-  // Payment Prep (2 items)
-  { id: '9', title: 'Contract I', partner: 'Company I', amount: 12000, status: 'Payment Ready', updatedAt: '2026-03-25T23:20:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  // Approval & Signature (4 more items)
+  { id: '5', title: 'Contract E', partner: 'Company E', amount: 15000, status: 'In Approval', updatedAt: '2026-03-26T21:45:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Finance', name: 'Lisa M.', status: 'Pending', estimatedDays: 2 }] },
+  { id: '6', title: 'Contract F', partner: 'Company F', amount: 32000, status: 'Approval Stuck', updatedAt: '2026-03-24T16:10:00Z', owner: 'Erin Z.', riskLevel: 'High', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'CEO', name: 'James W.', status: 'Pending', estimatedDays: 3 }] },
+  { id: '7', title: 'Contract G', partner: 'Company G', amount: 50000, status: 'In Approval', updatedAt: '2026-03-26T13:30:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [{ role: 'Strategy', name: 'Rachel K.', status: 'Pending', estimatedDays: 4 }] },
+  { id: '8', title: 'Contract H', partner: 'Company H', amount: 18000, status: 'Signing', updatedAt: '2026-03-26T22:05:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  
+  // Scenario 3: Payment Prep (Contract I)
+  { id: '9', title: 'Contract I', partner: 'Company I', amount: 12000, status: 'Payment Ready', updatedAt: '2026-03-25T23:20:00Z', owner: 'Na Zhang', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
+  
+  // Payment Prep (1 more item)
   { id: '10', title: 'Contract J', partner: 'Company J', amount: 9500, status: 'Payment Ready', updatedAt: '2026-03-26T15:45:00Z', owner: 'Erin Z.', riskLevel: 'Low', versions: [], comments: [], deliverables: [], approvalPath: [] },
   
   // Completed (8 items)
@@ -79,14 +93,35 @@ const PERFORMANCE_METRICS: MetricData[] = [
   { name: 'Error Rate', baseline: 5, goal: 1 },
 ];
 
-type ViewType = 'dashboard' | 'drafting' | 'negotiation' | 'approval' | 'payment' | 'admin' | 'all-contracts' | 'drafts-list' | 'negotiations-list' | 'create-contract' | 'workflow-drafting' | 'workflow-approval' | 'workflow-payment';
+type ViewType = 'dashboard' | 'drafting' | 'negotiation' | 'approval' | 'payment' | 'admin' | 'all-contracts' | 'drafts-list' | 'negotiations-list' | 'create-contract' | 'workflow-drafting' | 'workflow-approval' | 'workflow-payment' | 'approval-tracking' | 'payment-preparation';
 
 export default function App() {
   const [activeView, setActiveView] = useState<ViewType>('dashboard');
-  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [selectedContractId, setSelectedContractId] = useState<string | null>(null);
   const [contractsExpanded, setContractsExpanded] = useState(true);
   const [draftingContent, setDraftingContent] = useState<string>('');
   const [draftingTitle, setDraftingTitle] = useState<string>('');
+
+  const selectedContract = MOCK_CONTRACTS.find(c => c.id === selectedContractId) || MOCK_CONTRACTS[0];
+
+  const handleContractClick = (contractId: string) => {
+    const contract = MOCK_CONTRACTS.find(c => c.id === contractId);
+    if (!contract) return;
+
+    setSelectedContractId(contractId);
+
+    // Scenario-specific navigation
+    if (contractId === 'new-influencer') {
+      setActiveView('drafting');
+    } else if (contractId === '4') { // Contract D
+      setActiveView('approval-tracking');
+    } else if (contractId === '9') { // Contract I
+      setActiveView('payment-preparation');
+    } else {
+      // Default behavior for other contracts (display only or generic view)
+      // For the prototype, we only want these 3 to be interactive
+    }
+  };
 
   const handleCreateContract = () => {
     setActiveView('create-contract');
@@ -121,13 +156,7 @@ export default function App() {
         return (
           <DashboardView 
             contracts={MOCK_CONTRACTS} 
-            onSelectContract={(c) => { 
-              setSelectedContract(c); 
-              if (c.status === 'Drafting') setActiveView('drafting');
-              else if (c.status === 'Negotiation') setActiveView('negotiation');
-              else if (c.status === 'Signed') setActiveView('payment');
-              else setActiveView('approval');
-            }} 
+            onSelectContract={handleContractClick} 
             onNewContract={handleCreateContract}
             onNavigate={(view) => setActiveView(view as ViewType)}
           />
@@ -137,11 +166,7 @@ export default function App() {
           <ContractListView 
             title="All Contracts"
             contracts={MOCK_CONTRACTS}
-            onSelectContract={(c) => {
-              setSelectedContract(c);
-              if (c.status === 'Drafting') setActiveView('drafting');
-              else setActiveView('negotiation');
-            }}
+            onSelectContract={handleContractClick}
             onNewContract={handleCreateContract}
           />
         );
@@ -151,10 +176,7 @@ export default function App() {
             title="Draft Contracts"
             filterStatus="Drafting"
             contracts={MOCK_CONTRACTS}
-            onSelectContract={(c) => {
-              setSelectedContract(c);
-              setActiveView('drafting');
-            }}
+            onSelectContract={handleContractClick}
             onNewContract={handleCreateContract}
           />
         );
@@ -164,10 +186,7 @@ export default function App() {
             title="Active Negotiations"
             filterStatus="Negotiation"
             contracts={MOCK_CONTRACTS}
-            onSelectContract={(c) => {
-              setSelectedContract(c);
-              setActiveView('negotiation');
-            }}
+            onSelectContract={handleContractClick}
             onNewContract={handleCreateContract}
           />
         );
@@ -178,21 +197,28 @@ export default function App() {
           onBack={() => setActiveView('create-contract')} 
           onNext={() => setActiveView('negotiation')}
           onSendForApproval={() => {
-            // In a real app, we'd update the contract status in the backend
-            // Here we just navigate to the approval workflow list
-            setActiveView('workflow-approval');
+            // This is handled inside DraftingView now with a success modal
+            // But we can keep this as a fallback or for state updates
           }}
+          onViewApprovalStatus={() => {
+            setSelectedContractId('new-influencer');
+            setActiveView('approval-tracking');
+          }}
+        />;
+      case 'approval-tracking':
+        return <ApprovalTrackingView contract={selectedContract} onBack={() => setActiveView('dashboard')} />;
+      case 'payment-preparation':
+        return <PaymentPreparationView 
+          contract={selectedContract} 
+          onBack={() => setActiveView('dashboard')} 
+          onSubmit={() => setActiveView('dashboard')}
         />;
       case 'workflow-drafting':
         return (
           <ContractListView 
             title="Drafting & Negotiation"
             contracts={MOCK_CONTRACTS.filter(c => ['Drafting', 'Negotiation'].includes(c.status))}
-            onSelectContract={(c) => {
-              setSelectedContract(c);
-              if (c.status === 'Drafting') setActiveView('drafting');
-              else setActiveView('negotiation');
-            }}
+            onSelectContract={handleContractClick}
             onNewContract={handleCreateContract}
           />
         );
@@ -200,11 +226,8 @@ export default function App() {
         return (
           <ContractListView 
             title="Approval & Signature"
-            contracts={MOCK_CONTRACTS.filter(c => ['Legal Review', 'Finance Approval', 'Final Approval', 'Internal Consultation', 'IN APPROVAL'].includes(c.status))}
-            onSelectContract={(c) => {
-              setSelectedContract(c);
-              setActiveView('approval');
-            }}
+            contracts={MOCK_CONTRACTS.filter(c => ['Legal Review', 'Finance Approval', 'Final Approval', 'Internal Consultation', 'IN APPROVAL', 'Approval Stuck', 'In Approval', 'Signing'].includes(c.status))}
+            onSelectContract={handleContractClick}
             onNewContract={handleCreateContract}
           />
         );
@@ -212,20 +235,17 @@ export default function App() {
         return (
           <ContractListView 
             title="Payment Preparation"
-            contracts={MOCK_CONTRACTS.filter(c => ['Payment Ready', 'Signed'].includes(c.status))}
-            onSelectContract={(c) => {
-              setSelectedContract(c);
-              setActiveView('payment');
-            }}
+            contracts={MOCK_CONTRACTS.filter(c => c.status === 'Payment Ready')}
+            onSelectContract={handleContractClick}
             onNewContract={handleCreateContract}
           />
         );
       case 'negotiation':
-        return selectedContract ? <NegotiationView contract={selectedContract} /> : <div className="p-12 text-center text-slate-400">Please select a contract from the dashboard to view negotiation history.</div>;
+        return <NegotiationView contract={selectedContract} />;
       case 'approval':
-        return selectedContract ? <ApprovalView contract={selectedContract} /> : <div className="p-12 text-center text-slate-400">Please select a contract to view its approval workflow.</div>;
+        return <ApprovalView contract={selectedContract} />;
       case 'payment':
-        return selectedContract ? <PaymentView contract={selectedContract} /> : <div className="p-12 text-center text-slate-400">Please select a contract to prepare payment.</div>;
+        return <PaymentView contract={selectedContract} />;
       case 'admin':
         return <AdminView contracts={MOCK_CONTRACTS} />;
       case 'create-contract':
@@ -235,7 +255,7 @@ export default function App() {
           onUpload={handleUploadContract}
         />;
       default:
-        return <DashboardView contracts={MOCK_CONTRACTS} onSelectContract={setSelectedContract} onNewContract={handleCreateContract} />;
+        return <DashboardView contracts={MOCK_CONTRACTS} onSelectContract={handleContractClick} onNewContract={handleCreateContract} />;
     }
   };
 
@@ -351,7 +371,7 @@ export default function App() {
               {selectedContract && (activeView === 'negotiation' || activeView === 'approval' || activeView === 'payment') && (
                 <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 rounded-full border border-indigo-100">
                   <span className="text-xs font-bold text-indigo-600 truncate max-w-[200px]">{selectedContract.title}</span>
-                  <button onClick={() => setSelectedContract(null)} className="text-indigo-400 hover:text-indigo-600"><X size={14} /></button>
+                  <button onClick={() => setSelectedContractId(null)} className="text-indigo-400 hover:text-indigo-600"><X size={14} /></button>
                 </div>
               )}
             </div>

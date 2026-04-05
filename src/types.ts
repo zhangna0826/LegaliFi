@@ -1,10 +1,15 @@
-export type ContractStatus = 'Drafting' | 'Negotiation' | 'Internal Consultation' | 'Legal Review' | 'Finance Approval' | 'Final Approval' | 'Signed' | 'Payment Ready' | 'Paid';
+export type ContractStatus = 'Drafting' | 'Negotiation' | 'Internal Consultation' | 'Legal Review' | 'Finance Approval' | 'Final Approval' | 'Signed' | 'Payment Ready' | 'Paid' | 'Approval Stuck' | 'In Approval' | 'Signing';
 
 export interface Comment {
   id: string;
   author: string;
+  role?: string;
   text: string;
   timestamp: string;
+  article?: string;
+  isInternal?: boolean;
+  isResolved?: boolean;
+  resolvedBy?: string;
   replies?: Comment[];
 }
 
@@ -32,6 +37,7 @@ export interface Risk {
   description: string;
   suggestion: string;
   status: 'Pending' | 'Ignored' | 'Fixed';
+  article?: string;
 }
 
 export interface Contract {
