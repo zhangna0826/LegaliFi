@@ -65,7 +65,7 @@ export const PaymentPreparationView: React.FC<PaymentPreparationViewProps> = ({ 
         onSecondaryAction={() => setShowSuccess(false)}
         details={[
           { label: 'Status', value: 'Submitted to Finance' },
-          { label: 'Estimated Processing', value: '15 business days' }
+          { label: 'Estimated Processing', value: '2 business days' }
         ]}
       />
 

@@ -33,19 +33,27 @@ interface ApprovalTrackingViewProps {
 }
 
 export const ApprovalTrackingView: React.FC<ApprovalTrackingViewProps> = ({ contract, onBack }) => {
-  const [isNudging, setIsNudging] = useState(false);
+  const [nudgePhase, setNudgePhase] = useState<'idle' | 'sending' | 'sent' | 'completed'>('idle');
   const [showToast, setShowToast] = useState<string | null>(null);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [showAttachModal, setShowAttachModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showSigningModal, setShowSigningModal] = useState(false);
 
   const handleNudge = (name: string) => {
-    setIsNudging(true);
+    setNudgePhase('sending');
+    
+    // Phase 2: After 1 second
     setTimeout(() => {
-      setIsNudging(false);
-      setShowToast(`Reminder sent to ${name} successfully`);
-      setTimeout(() => setShowToast(null), 3000);
-    }, 800);
+      setNudgePhase('sent');
+      setShowToast(`Reminder sent to ${name}`);
+      
+      // Phase 3: After 3 seconds total (2s after toast)
+      setTimeout(() => {
+        setShowToast(null);
+        setNudgePhase('completed');
+      }, 2000);
+    }, 1000);
   };
 
   const handleWithdrawConfirm = () => {
@@ -111,24 +119,40 @@ export const ApprovalTrackingView: React.FC<ApprovalTrackingViewProps> = ({ cont
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Overall Progress</p>
             <div className="flex items-center gap-3">
               <div className="w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
-                <div className="h-full bg-indigo-600 w-[50%]" />
+                <div className={cn(
+                  "h-full transition-all duration-1000",
+                  nudgePhase === 'completed' ? "bg-emerald-500 w-full" : "bg-indigo-600 w-[50%]"
+                )} />
               </div>
-              <span className="text-xs font-bold text-slate-700">2 of 4 steps completed</span>
+              <span className="text-xs font-bold text-slate-700">
+                {nudgePhase === 'completed' ? "4 of 4 steps completed" : "2 of 4 steps completed"}
+              </span>
             </div>
           </div>
           <div className="h-10 w-px bg-slate-100" />
           <div className="flex flex-col gap-1.5">
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Current Status</p>
-            <p className="text-xs font-bold text-slate-800 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              Legal Director Approval · <span className="text-red-600">Delayed 2 days</span>
-            </p>
+            {nudgePhase === 'completed' ? (
+              <p className="text-xs font-bold text-emerald-600 flex items-center gap-2">
+                <CheckCircle2 size={14} />
+                All Approvals Complete
+              </p>
+            ) : (
+              <p className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                Legal Director Approval · <span className="text-red-600">Delayed 2 days</span>
+              </p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-8">
           <div className="text-right">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estimated Completion</p>
-            <p className="text-xs font-bold text-slate-800">March 31, 2026</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              {nudgePhase === 'completed' ? "Completed Date" : "Estimated Completion"}
+            </p>
+            <p className="text-xs font-bold text-slate-800">
+              {nudgePhase === 'completed' ? "Completed March 27, 2026" : "March 31, 2026"}
+            </p>
           </div>
         </div>
       </div>
@@ -227,18 +251,33 @@ export const ApprovalTrackingView: React.FC<ApprovalTrackingViewProps> = ({ cont
 
                 {/* Step 3: Legal Director Approval (STUCK) */}
                 <div className="relative flex gap-6">
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0 shadow-sm border-4 border-white ring-4 ring-red-50">
-                    <Clock size={16} />
+                  <div className={cn(
+                    "relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm border-4 border-white transition-all duration-500",
+                    nudgePhase === 'completed' ? "bg-emerald-500 text-white" : "bg-red-500 text-white ring-4 ring-red-50"
+                  )}>
+                    {nudgePhase === 'completed' ? <CheckCircle2 size={16} /> : <Clock size={16} />}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-slate-800 text-sm">#03 Legal Director Approval</h4>
-                        <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-600 text-[8px] font-bold uppercase tracking-wider">IN PROGRESS</span>
+                        <span className={cn(
+                          "px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider transition-all duration-500",
+                          nudgePhase === 'completed' ? "bg-emerald-50 text-emerald-600" : "bg-indigo-50 text-indigo-600"
+                        )}>
+                          {nudgePhase === 'completed' ? "APPROVED" : "IN PROGRESS"}
+                        </span>
                       </div>
-                      <span className="text-[10px] font-bold text-red-600">Delayed: 2 days</span>
+                      {nudgePhase === 'completed' ? (
+                        <span className="text-[10px] font-bold text-slate-400">2026-03-27 02:15 PM (just now)</span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-red-600">Delayed: 2 days</span>
+                      )}
                     </div>
-                    <div className="bg-white border border-red-100 rounded-xl p-4 shadow-sm ring-1 ring-red-50">
+                    <div className={cn(
+                      "bg-white border rounded-xl p-4 shadow-sm transition-all duration-500",
+                      nudgePhase === 'completed' ? "border-slate-100" : "border-red-100 ring-1 ring-red-50"
+                    )}>
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs border border-indigo-200">JW</div>
@@ -249,53 +288,87 @@ export const ApprovalTrackingView: React.FC<ApprovalTrackingViewProps> = ({ cont
                         </div>
                       </div>
                       
-                      <div className="bg-red-50 rounded-lg p-3 border border-red-100 mb-4">
-                        <p className="text-[11px] text-red-700 font-medium flex items-center gap-2">
-                          <AlertCircle size={14} />
-                          Awaiting response for 2 days. This node is currently exceeding the expected processing time.
-                        </p>
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                        <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                          <Mail size={18} />
-                        </button>
-                        <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                          <MessageSquare size={18} />
-                        </button>
-                        <div className="flex flex-col items-center">
-                          <button 
-                            onClick={() => handleNudge('James W.')}
-                            disabled={isNudging}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-red-600/20 hover:bg-red-700 transition-all active:scale-95"
-                          >
-                            {isNudging ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Zap size={14} className="fill-current" />}
-                            <span>Nudge Now</span>
-                          </button>
-                          <span className="text-[8px] text-slate-400 font-bold mt-1">Remind James W.</span>
+                      {nudgePhase !== 'completed' && (
+                        <div className="bg-red-50 rounded-lg p-3 border border-red-100 mb-4">
+                          <p className="text-[11px] text-red-700 font-medium flex items-center gap-2">
+                            <AlertCircle size={14} />
+                            Awaiting response for 2 days. This node is currently exceeding the expected processing time.
+                          </p>
                         </div>
-                      </div>
+                      )}
+
+                      {nudgePhase === 'completed' ? (
+                        <div className="bg-slate-50/50 rounded-lg p-3 border border-slate-100/50">
+                          <p className="text-xs text-slate-600 leading-relaxed">
+                            Approved. No legal concerns.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                          <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                            <Mail size={18} />
+                          </button>
+                          <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                            <MessageSquare size={18} />
+                          </button>
+                          <div className="flex flex-col items-center">
+                            <button 
+                              onClick={() => handleNudge('James W.')}
+                              disabled={nudgePhase !== 'idle'}
+                              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl text-xs font-bold shadow-lg shadow-red-600/20 hover:bg-red-700 transition-all active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+                            >
+                              {nudgePhase === 'sending' ? (
+                                <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              ) : (
+                                <Zap size={14} className="fill-current" />
+                              )}
+                              <span>
+                                {nudgePhase === 'sending' ? "Sending..." : "Nudge Now"}
+                              </span>
+                            </button>
+                            <span className="text-[8px] text-slate-400 font-bold mt-1">Remind James W.</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Step 4: Finance Review */}
                 <div className="relative flex gap-6">
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-white text-slate-300 flex items-center justify-center shrink-0 shadow-sm border-4 border-white border-slate-100">
-                    <User size={16} />
+                  <div className={cn(
+                    "relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm border-4 border-white transition-all duration-500",
+                    nudgePhase === 'completed' ? "bg-emerald-500 text-white" : "bg-white text-slate-300 border-slate-100"
+                  )}>
+                    {nudgePhase === 'completed' ? <CheckCircle2 size={16} /> : <User size={16} />}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <h4 className="font-bold text-slate-800 text-sm">#04 Finance Review</h4>
-                        <span className="px-2 py-0.5 rounded bg-slate-50 text-slate-400 text-[8px] font-bold uppercase tracking-wider">PENDING</span>
+                        <span className={cn(
+                          "px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider transition-all duration-500",
+                          nudgePhase === 'completed' ? "bg-emerald-50 text-emerald-600" : "bg-slate-50 text-slate-400"
+                        )}>
+                          {nudgePhase === 'completed' ? "APPROVED" : "PENDING"}
+                        </span>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400">Awaiting</span>
+                      {nudgePhase === 'completed' ? (
+                        <span className="text-[10px] font-bold text-slate-400">2026-03-27 02:20 PM (just now)</span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-slate-400">Awaiting</span>
+                      )}
                     </div>
-                    <div className="bg-white border border-slate-100 border-dashed rounded-xl p-4 shadow-sm">
+                    <div className={cn(
+                      "bg-white border rounded-xl p-4 shadow-sm transition-all duration-500",
+                      nudgePhase === 'completed' ? "border-slate-100" : "border-slate-100 border-dashed"
+                    )}>
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 font-bold text-xs border border-slate-100">MR</div>
+                          <div className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border transition-all duration-500",
+                            nudgePhase === 'completed' ? "bg-indigo-100 text-indigo-700 border-indigo-200" : "bg-slate-50 text-slate-400 border-slate-100"
+                          )}>MR</div>
                           <div>
                             <p className="text-xs font-bold text-slate-800">Mike R.</p>
                             <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">FINANCE</p>
@@ -303,8 +376,11 @@ export const ApprovalTrackingView: React.FC<ApprovalTrackingViewProps> = ({ cont
                         </div>
                       </div>
                       <div className="bg-slate-50/50 rounded-lg p-3 border border-slate-100/50">
-                        <p className="text-xs text-slate-400 italic">
-                          No comments provided
+                        <p className={cn(
+                          "text-xs leading-relaxed transition-all duration-500",
+                          nudgePhase === 'completed' ? "text-slate-600" : "text-slate-400 italic"
+                        )}>
+                          {nudgePhase === 'completed' ? "Budget verified and approved." : "No comments provided"}
                         </p>
                       </div>
                     </div>
@@ -314,28 +390,56 @@ export const ApprovalTrackingView: React.FC<ApprovalTrackingViewProps> = ({ cont
             </div>
 
             <div className="p-5 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <button 
-                  className="px-5 py-2.5 bg-white border border-indigo-600 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-50 transition-all flex items-center gap-2"
+              {nudgePhase === 'completed' ? (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="w-full bg-emerald-50 border-l-4 border-emerald-500 rounded-r-xl p-4 flex items-center justify-between"
                 >
-                  <PlusCircle size={16} />
-                  Add Comment
-                </button>
-                <button 
-                  className="px-5 py-2.5 bg-white border border-indigo-600 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-50 transition-all flex items-center gap-2"
-                >
-                  <Paperclip size={16} />
-                  Attach File
-                </button>
-              </div>
-              <div className="flex items-center gap-6">
-                <button 
-                  className="px-5 py-2.5 bg-white border border-red-600 text-red-600 rounded-xl font-bold text-sm hover:bg-red-50 transition-all flex items-center gap-2"
-                >
-                  <Trash2 size={16} />
-                  Withdraw Application
-                </button>
-              </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shadow-sm">
+                      <CheckCircle2 size={20} />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-800">All Approvals Completed!</h4>
+                      <p className="text-xs text-slate-500">This contract is ready for signing.</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setShowSigningModal(true)}
+                    className="px-6 py-2.5 bg-indigo-900 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-900/20 hover:bg-indigo-950 transition-all flex items-center gap-2 group"
+                  >
+                    <span>Proceed to Signing</span>
+                    <ChevronLeft size={18} className="rotate-180 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                </motion.div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3">
+                    <button 
+                      className="px-5 py-2.5 bg-white border border-indigo-600 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-50 transition-all flex items-center gap-2"
+                    >
+                      <PlusCircle size={16} />
+                      Add Comment
+                    </button>
+                    <button 
+                      className="px-5 py-2.5 bg-white border border-indigo-600 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-50 transition-all flex items-center gap-2"
+                    >
+                      <Paperclip size={16} />
+                      Attach File
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <button 
+                      onClick={() => setShowWithdrawModal(true)}
+                      className="px-5 py-2.5 bg-white border border-red-600 text-red-600 rounded-xl font-bold text-sm hover:bg-red-50 transition-all flex items-center gap-2"
+                    >
+                      <Trash2 size={16} />
+                      Withdraw Application
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -425,6 +529,40 @@ export const ApprovalTrackingView: React.FC<ApprovalTrackingViewProps> = ({ cont
                 <button onClick={() => setShowWithdrawModal(false)} className="px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-lg">Cancel</button>
                 <button onClick={handleWithdrawConfirm} className="px-6 py-2 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700">Confirm Withdrawal</button>
               </div>
+            </div>
+          </Modal>
+        )}
+
+        {showSigningModal && (
+          <Modal title="Signing Request Sent" onClose={() => setShowSigningModal(false)}>
+            <div className="space-y-6 text-center py-4">
+              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-sm">
+                <CheckCircle2 size={32} />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-xl font-bold text-slate-900">Signing Request Sent</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">
+                  Signing request has been sent to all parties. You will be notified when all signatures are collected.
+                </p>
+              </div>
+
+              <div className="bg-slate-50 rounded-xl p-4 text-left space-y-2 border border-slate-100">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</span>
+                  <span className="text-xs font-bold text-slate-700">Sent for Signature</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Estimated Processing</span>
+                  <span className="text-xs font-bold text-slate-700">2 business days</span>
+                </div>
+              </div>
+
+              <button 
+                onClick={onBack}
+                className="w-full py-3 bg-indigo-900 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-900/20 hover:bg-indigo-950 transition-all"
+              >
+                Back to Dashboard
+              </button>
             </div>
           </Modal>
         )}

@@ -174,7 +174,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                     label: 'STUCK'
                   };
                 }
-                if (status === 'Signed') {
+                if (status === 'Signed' || status === 'Signing') {
                   if (pipelineFilter === 'Approval & Signature' || contractId === '8') {
                     return {
                       icon: <PenTool size={20} />,
@@ -320,7 +320,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ contracts, onSelec
                             return `Step ${x} of ${y}`;
                           }
                           if (config.label === 'SIGNING') {
-                            return `Step 5 of 5`;
+                            return `Step 4 of 4`;
                           }
                           if (config.label === 'PAYMENT PREPARATION' || config.label === 'MANAGER REVIEW' || config.label === 'EVIDENCE COLLECTION') {
                             let x = 1, y = 4;
